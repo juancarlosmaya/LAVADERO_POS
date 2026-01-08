@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Conexión BLE</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .status-box {
+            margin: 20px auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+            max-width: 400px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Prueba de Escáner Bluetooth</h1>
+    <p>Esta página verifica si tu navegador puede ver la impresora.</p>
+
+    <div class="status-box" id="console">
+        Esperando acción del usuario...
+    </div>
+
+    <button id="scanBtn" onclick="testConnection()">🔍 Escanear Dispositivos</button>
+
+    <script>
+        async function testConnection() {
+            const consoleDiv = document.getElementById('console');
+            const btn = document.getElementById('scanBtn');
+
+            try {
+                if (!navigator.bluetooth) {
+                    throw new Error("❌ Web Bluetooth no soportado. Asegúrate de usar Chrome en Android y estar en HTTPS (o activar flags).");
+                }
+
+                btn.disabled = true;
+                consoleDiv.innerHTML = "Buscando dispositivos...<br><small>Por favor selecciona tu impresora en la ventana emergente.</small>";
+
+                // Intentar escanear TODO para ver si aparece ALGO
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // Servicio de impresión común
+                });
+
+                consoleDiv.innerHTML = `
+                    <div class="success">✅ ¡Dispositivo Encontrado!</div>
+                    <br>
+                    <strong>Nombre:</strong> ${device.name || 'Desconocido'}<br>
+                    <strong>ID:</strong> ${device.id}<br>
+                    <br>
+                    Esto confirma que la impresora es accesible desde la web.
+                `;
+
+            } catch (error) {
+                consoleDiv.innerHTML = `<div class="error">⚠️ Resultado:</div> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

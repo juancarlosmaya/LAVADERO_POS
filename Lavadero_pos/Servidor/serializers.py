@@ -1,0 +1,31 @@
+from rest_framework import serializers
+from .models import Cliente, Vehiculo, Servicio, Orden, Pago
+
+class ClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = '__all__'
+
+class VehiculoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vehiculo
+        fields = '__all__'
+
+class ServicioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Servicio
+        fields = '__all__'
+
+class OrdenSerializer(serializers.ModelSerializer):
+    # Nested info for display
+    vehiculo_placa = serializers.CharField(source='vehiculo.placa', read_only=True)
+    servicios_details = ServicioSerializer(source='servicios', many=True, read_only=True)
+
+    class Meta:
+        model = Orden
+        fields = '__all__'
+
+class PagoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pago
+        fields = '__all__'

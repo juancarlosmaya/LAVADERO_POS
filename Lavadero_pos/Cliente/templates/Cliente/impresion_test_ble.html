@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Conexión BLE</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .status-box {
+            margin: 20px auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+            max-width: 400px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Prueba de Escáner Bluetooth</h1>
+    <p>Esta página verifica si tu navegador puede ver la impresora.</p>
+
+    <div class="status-box" id="console">
+        Esperando acción del usuario...
+    </div>
+
+    <button id="scanBtn" onclick="testConnection()">🔍 1. Conectar Impresora</button>
+    <button id="printBtn" onclick="printTest()" disabled style="background-color: #007bff;">🖨️ 2. Imprimir Ticket de
+        Prueba</button>
+
+    <script>
+        let connectedDevice = null;
+        let printCharacteristic = null;
+
+        async function testConnection() {
+            const consoleDiv = document.getElementById('console');
+            const btn = document.getElementById('scanBtn');
+            const printBtn = document.getElementById('printBtn');
+
+            try {
+                if (!navigator.bluetooth) {
+                    throw new Error("❌ Web Bluetooth no soportado. Asegúrate de usar Chrome en Android y estar en HTTPS.");
+                }
+
+                btn.disabled = true;
+                consoleDiv.innerHTML = "Buscando dispositivos...<br><small>Selecciona tu impresora BLE.</small>";
+
+                connectedDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+                });
+
+                consoleDiv.innerHTML = "Conectando al servidor GATT...";
+                const server = await connectedDevice.gatt.connect();
+
+                consoleDiv.innerHTML = "Buscando servicio de impresión...";
+                const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+
+                consoleDiv.innerHTML = "Buscando característica de escritura...";
+                printCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+                consoleDiv.innerHTML = `
+                    <div class="success">✅ ¡Conectado a ${connectedDevice.name || 'Impresora'}!</div>
+                    <br>Ya puedes intentar imprimir el ticket de prueba.
+                `;
+                printBtn.disabled = false;
+
+            } catch (error) {
+                consoleDiv.innerHTML = `<div class="error">⚠️ Error:</div> ${error.message}`;
+                btn.disabled = false;
+            }
+        }
+
+        async function printTest() {
+            const consoleDiv = document.getElementById('console');
+            if (!printCharacteristic) return;
+
+            try {
+                consoleDiv.innerHTML = "Enviando datos a la impresora...";
+
+                // Texto de prueba con algunos comandos ESC/POS básicos (opcional)
+                const encoder = new TextEncoder();
+                const text = "\n" +
+                    "      EMOTORS POS      \n" +
+                    "-----------------------\n" +
+                    "   PRUEBA DE IMPRESION  \n" +
+                    "  ¡Conexion exitosa!   \n" +
+                    "-----------------------\n" +
+                    "\n\n\n";
+
+                const data = encoder.encode(text);
+                await printCharacteristic.writeValue(data);
+
+                consoleDiv.innerHTML += `<br><div class="success">✅ ¡Ticket enviado con éxito!</div>`;
+            } catch (error) {
+                consoleDiv.innerHTML = `<div class="error">⚠️ Error al imprimir:</div> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
