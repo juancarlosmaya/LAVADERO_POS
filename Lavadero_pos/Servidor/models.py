@@ -18,6 +18,7 @@ class Vehiculo(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)
+    modelo = models.CharField(max_length=50, blank=True, null=True)
     
     def __str__(self):
         return f"{self.placa} - {self.tipo}"

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Servicios - EMOTORS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #1c1e21;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e4e6eb;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #050505;
+        }
+
+        .date-badge {
+            background-color: #e7f3ff;
+            color: #1877f2;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1877f2 0%, #0056b3 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-info h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .summary-info .amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            text-align: left;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-bottom: 2px solid #dee2e6;
+            color: #65676b;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e4e6eb;
+            font-size: 15px;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .placa-tag {
+            font-family: monospace;
+            background: #fff9c4;
+            padding: 3px 8px;
+            border: 1px solid #fbc02d;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-carro {
+            background-color: #fff0f0;
+            color: #d32f2f;
+        }
+
+        .badge-moto {
+            background-color: #f0f4ff;
+            color: #1976d2;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-back:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #65676b;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            th:nth-child(3),
+            td:nth-child(3) {
+                display: none;
+            }
+
+            .summary-info .amount {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Estado de Servicios</h1>
+            <div class="date-badge">{{ fecha|date:"d M Y" }}</div>
+        </header>
+
+        <div class="summary-card">
+            <div class="summary-info">
+                <h2>Total Ingresos del Día</h2>
+                <div class="amount" id="totalGeneral">${{ total_dia|floatformat:0 }}</div>
+            </div>
+            <div class="summary-icon">
+                <!-- Icono de billete o bolsa de dinero opcional -->
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8;">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+            </div>
+        </div>
+
+        {% if ordenes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Servicios</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                <tr>
+                    <td style="color: #65676b; font-size: 13px;">{{ orden.fecha_creacion|date:"h:i A" }}</td>
+                    <td><span class="placa-tag">{{ orden.vehiculo.placa }}</span></td>
+                    <td>
+                        <span
+                            class="badge {% if orden.vehiculo.tipo == 'CARRO' %}badge-carro{% else %}badge-moto{% endif %}">
+                            {{ orden.vehiculo.get_tipo_display }}
+                        </span>
+                    </td>
+                    <td style="max-width: 250px; font-size: 14px;">
+                        {% for s in orden.servicios.all %}
+                        {{ s.nombre }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td style="font-weight: 600; color: #2e7d32;">
+                        ${{ orden.total_calculado|floatformat:0 }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>No hay servicios registrados para el día de hoy.</p>
+        </div>
+        {% endif %}
+
+        <a href="/" class="btn-back">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Volver al Dashboard
+        </a>
+    </div>
+</body>
+
+</html>

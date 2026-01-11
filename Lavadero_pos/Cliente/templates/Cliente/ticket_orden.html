@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Orden #{{ orden.id }}</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .ticket {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: sans-serif;
+        }
+
+        .btn-print {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-home {
+            background: #6c757d;
+            color: white;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ticket" id="ticketContent">
+        <div class="header">
+            <strong>EMOTORS POS</strong><br>
+            Autolavado Profesional<br>
+            Soacha, Cundinamarca
+        </div>
+        <div class="divider"></div>
+        <div class="row"><strong>ORDEN:</strong> <span>#{{ orden.id }}</span></div>
+        <div class="row"><strong>FECHA:</strong> <span>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</span></div>
+        <div class="row"><strong>PLACA:</strong> <span>{{ orden.vehiculo.placa }}</span></div>
+        {% if orden.vehiculo.cliente %}
+        <div class="row"><strong>CLIENTE:</strong> <span>{{ orden.vehiculo.cliente.nombre|default:"Cliente" }}</span>
+        </div>
+        {% endif %}
+        <div class="divider"></div>
+        <strong>SERVICIOS:</strong>
+        {% for servicio in orden.servicios.all %}
+        <div class="row">
+            <span>{{ servicio.nombre }}</span>
+            <span>${{ servicio.precio|floatformat:0 }}</span>
+        </div>
+        {% endfor %}
+        <div class="divider"></div>
+        {% if orden.observaciones %}
+        <p><strong>Obs:</strong> {{ orden.observaciones }}</p>
+        <div class="divider"></div>
+        {% endif %}
+        <div class="footer">
+            ¡Gracias por preferir EMOTORS!<br>
+            Conserva este tiquet para retirar tu vehiculo.
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button id="btnConnect" class="btn btn-print" onclick="connectAndPrint()">🔍 1. Conectar e Imprimir</button>
+        <a href="/nueva-orden/" class="btn btn-new">➕ Nueva Orden</a>
+        <a href="/" class="btn btn-home">🏠 Ir al Inicio</a>
+    </div>
+    <div id="status" class="status-msg"></div>
+
+    <script>
+        let printCharacteristic = null;
+
+        async function connectAndPrint() {
+            const status = document.getElementById('status');
+            const btn = document.getElementById('btnConnect');
+
+            try {
+                if (!navigator.bluetooth) {
+                    throw new Error("Bluetooth no soportado en este navegador.");
+                }
+
+                status.innerText = "Buscando impresora...";
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+                });
+
+                status.innerText = "Conectando...";
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+                printCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+                status.innerText = "Imprimiendo...";
+                await sendPrintData();
+                status.innerText = "✅ Impresión enviada.";
+
+            } catch (error) {
+                console.error(error);
+                status.innerText = "❌ Error: " + error.message;
+            }
+        }
+
+        async function sendPrintData() {
+            const encoder = new TextEncoder();
+
+            // Comandos ESC/POS muy básicos
+            const esc = "\x1B";
+            const center = esc + "a1";
+            const left = esc + "a0";
+            const boldOn = esc + "E1";
+            const boldOff = esc + "E0";
+            const init = esc + "@";
+
+            let text = init + center + boldOn + "EMOTORS POS\n" + boldOff +
+                "Autolavado Profesional\n" +
+                "--------------------------------\n" +
+                left +
+                "ORDEN: #{{ orden.id }}\n" +
+                "FECHA: {{ orden.fecha_creacion|date:'d/m/y H:i' }}\n" +
+                "PLACA: {{ orden.vehiculo.placa }}\n" +
+                "--------------------------------\n" +
+                "SERVICIOS:\n";
+
+            {% for servicio in orden.servicios.all %}
+            text += "- {{ servicio.nombre }}  ${{ servicio.precio|floatformat:0 }}\n";
+            {% endfor %}
+
+            text += "--------------------------------\n" +
+                center + "¡Gracias por su visita!\n\n\n\n\n";
+
+            const data = encoder.encode(text);
+            await printCharacteristic.writeValue(data);
+        }
+    </script>
+</body>
+
+</html>
