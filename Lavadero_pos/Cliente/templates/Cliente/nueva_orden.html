@@ -224,7 +224,7 @@
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
         </div>
-        <h1>Nueva Orden</h1>
+        <h1>{{ lavadero.nombre|default:"Nueva Orden" }}</h1>
         <form id="orderForm">
             <div class="form-group">
                 <label for="placa">Número de Placa (Obligatorio)</label>
@@ -236,6 +236,9 @@
                 <select id="tipo_vehiculo" onchange="filterServices()" required>
                     <option value="CARRO">Carro</option>
                     <option value="MOTO">Moto</option>
+                    <option value="CAMIONETA_5">Camioneta (5 Pasajeros)</option>
+                    <option value="CAMIONETA_7">Camioneta (7 Pasajeros)</option>
+                    <option value="BICICLETA">Bicicleta</option>
                 </select>
             </div>
 

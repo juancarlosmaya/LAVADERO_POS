@@ -19,6 +19,8 @@ class ServicioSerializer(serializers.ModelSerializer):
 class OrdenSerializer(serializers.ModelSerializer):
     # Nested info for display
     vehiculo_placa = serializers.CharField(source='vehiculo.placa', read_only=True)
+    cliente_nombre = serializers.CharField(source='cliente.nombre', read_only=True)
+    cliente_celular = serializers.CharField(source='cliente.celular', read_only=True)
     servicios_details = ServicioSerializer(source='servicios', many=True, read_only=True)
 
     class Meta:

@@ -13,9 +13,12 @@ class Vehiculo(models.Model):
     TIPO_CHOICES = [
         ('CARRO', 'Automóvil'),
         ('MOTO', 'Motocicleta'),
+        ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
+        ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
+        ('BICICLETA', 'Bicicleta'),
     ]
     placa = models.CharField(max_length=10, unique=True)
-    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)
     modelo = models.CharField(max_length=50, blank=True, null=True)
@@ -27,11 +30,14 @@ class Servicio(models.Model):
     CATEGORIA_CHOICES = [
         ('CARRO', 'Carro'),
         ('MOTO', 'Moto'),
+        ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
+        ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
+        ('BICICLETA', 'Bicicleta'),
     ]
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    categoria = models.CharField(max_length=10, choices=CATEGORIA_CHOICES, default='CARRO')
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default='CARRO')
     activo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -45,6 +51,7 @@ class Orden(models.Model):
         ('ENTREGADO', 'Entregado'),
     ]
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, related_name='ordenes')
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordenes')
     servicios = models.ManyToManyField(Servicio, related_name='ordenes')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='EN_COLA')
     fecha_creacion = models.DateTimeField(default=timezone.now)
