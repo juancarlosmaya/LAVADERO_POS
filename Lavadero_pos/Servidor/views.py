@@ -1,13 +1,18 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Cliente, Vehiculo, Servicio, Orden, Pago
+from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero
 from .serializers import (
     ClienteSerializer, 
     VehiculoSerializer, 
     ServicioSerializer, 
     OrdenSerializer, 
-    PagoSerializer
+    PagoSerializer,
+    LavaderoSerializer
 )
+
+class LavaderoViewSet(viewsets.ModelViewSet):
+    queryset = Lavadero.objects.all()
+    serializer_class = LavaderoSerializer
 
 class ClienteViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()

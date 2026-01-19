@@ -1,6 +1,16 @@
 from django.db import models
 from django.utils import timezone
 
+class Lavadero(models.Model):
+    nombre = models.CharField(max_length=100)
+    nit = models.CharField(max_length=20, unique=True)
+    direccion = models.CharField(max_length=200, blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    correo_electronico = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
 class Cliente(models.Model):
     celular = models.CharField(max_length=15, unique=True)
     nombre = models.CharField(max_length=100, blank=True, null=True)
@@ -22,6 +32,7 @@ class Vehiculo(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)
     modelo = models.CharField(max_length=50, blank=True, null=True)
+    Lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='vehiculos')  
     
     def __str__(self):
         return f"{self.placa} - {self.tipo}"
@@ -39,6 +50,7 @@ class Servicio(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default='CARRO')
     activo = models.BooleanField(default=True)
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='servicios')
 
     def __str__(self):
         return f"{self.nombre} ({self.get_categoria_display()}) - ${self.precio}"
@@ -56,6 +68,7 @@ class Orden(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='EN_COLA')
     fecha_creacion = models.DateTimeField(default=timezone.now)
     observaciones = models.TextField(blank=True, null=True)
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='ordenes')
 
     def __str__(self):
         return f"Orden #{self.id} - {self.vehiculo.placa}"
@@ -71,6 +84,7 @@ class Pago(models.Model):
     metodo = models.CharField(max_length=20, choices=METODO_CHOICES)
     monto = models.DecimalField(max_digits=12, decimal_places=0)
     fecha_pago = models.DateTimeField(auto_now_add=True)
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='pagos')
 
     def __str__(self):
         return f"Pago Orden #{self.orden.id} - {self.monto}"
