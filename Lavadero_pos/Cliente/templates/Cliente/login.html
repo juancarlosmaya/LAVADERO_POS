@@ -1,0 +1,51 @@
+{% extends 'Cliente/base.html' %}
+
+{% block title %}Login - Lavadero POS{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'Cliente/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<body class="login-page">
+    <div class="login-container">
+        <div class="logo-container">
+            <div class="logo-circle">🚗</div>
+            <h1>Lavadero POS</h1>
+            <p class="subtitle">Inicia sesión en tu cuenta</p>
+        </div>
+
+        <!-- Mostrar errores si los hay -->
+        {% if formulario.non_field_errors %}
+        <div class="error-message">
+            {% for error in formulario.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ formulario.nombreUsuario.id_for_label }}">{{ formulario.nombreUsuario.label }}</label>
+                {{ formulario.nombreUsuario }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ formulario.contrasenaUsuario.id_for_label }}">{{ formulario.contrasenaUsuario.label
+                    }}</label>
+                {{ formulario.contrasenaUsuario }}
+            </div>
+
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+
+        <div class="footer-text">
+            ¿Necesitas ayuda? Contacta al administrador
+        </div>
+    </div>
+</body>
+{% endblock %}

@@ -1,23 +1,80 @@
-from Servidor.models import Servicio, Orden
-from django.shortcuts import render
+from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth import authenticate, login, logout
+from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm
 
 def dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     return render(request, 'Cliente/dashboard.html')
 
 def vista_test_bluetooth(request):
     return render(request, 'Cliente/impresion_test_ble.html')
 
 def crear_orden(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        vehiculo_form = VehiculoForm(request.POST)
+        cliente_form = ClienteForm(request.POST)
+        orden_form = OrdenForm(request.POST)
+        servicios_ids = request.POST.getlist('servicios')
+        
+        if vehiculo_form.is_valid() and cliente_form.is_valid() and orden_form.is_valid() and servicios_ids:
+            # Obtener o crear cliente
+            cliente, _ = Cliente.objects.get_or_create(
+                celular=cliente_form.cleaned_data['celular'],
+                defaults={'nombre': cliente_form.cleaned_data['nombre']}
+            )
+            
+            # Obtener o crear vehículo
+            vehiculo, _ = Vehiculo.objects.get_or_create(
+                placa=vehiculo_form.cleaned_data['placa'].upper(),
+                defaults={
+                    'tipo': vehiculo_form.cleaned_data['tipo'],
+                    'marca': vehiculo_form.cleaned_data['marca'],
+                    'modelo': vehiculo_form.cleaned_data['modelo'],
+                    'cliente': cliente,
+                    'Lavadero': Lavadero.objects.first()
+                }
+            )
+            
+            # Crear orden
+            orden = orden_form.save(commit=False)
+            orden.vehiculo = vehiculo
+            orden.cliente = cliente
+            orden.lavadero = Lavadero.objects.first()
+            orden.save()
+            
+            # Agregar servicios
+            orden.servicios.set(servicios_ids)
+            
+            return redirect('ticket_orden', orden_id=orden.id)
+    else:
+        vehiculo_form = VehiculoForm()
+        cliente_form = ClienteForm()
+        orden_form = OrdenForm()
+    
     servicios = Servicio.objects.filter(activo=True)
-    return render(request, 'Cliente/nueva_orden.html', {'servicios': servicios})
+    return render(request, 'Cliente/nueva_orden.html', {
+        'vehiculo_form': vehiculo_form,
+        'cliente_form': cliente_form,
+        'orden_form': orden_form,
+        'servicios': servicios
+    })
 
 def ticket_orden(request, orden_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     orden = Orden.objects.get(id=orden_id)
     return render(request, 'Cliente/ticket_orden.html', {'orden': orden})
 
 def estado_servicios(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     periodo = request.GET.get('periodo', 'dia')
     hoy = timezone.localtime(timezone.now()).date()
     
@@ -49,3 +106,22 @@ def estado_servicios(request):
         'titulo': titulo_periodo,
         'periodo_actual': periodo
     })
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        formulario = loginFormulario(request.POST)
+        if formulario.is_valid():
+            nombreUsuario = formulario.cleaned_data['nombreUsuario']
+            contrasenaUsuario = formulario.cleaned_data['contrasenaUsuario']
+            usuario = authenticate(request, username = nombreUsuario, password = contrasenaUsuario)
+            if usuario is not None:
+                login(request, usuario)
+                return redirect('dashboard')
+            else:
+                formulario.add_error(None, 'Nombre de usuario o contraseña incorrectos.')
+    else:
+        formulario = loginFormulario()
+    return render(request, 'Cliente/login.html', {'formulario': formulario})
