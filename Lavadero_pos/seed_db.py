@@ -6,7 +6,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Lavadero_pos.settings')
 django.setup()
 
-from Servidor.models import Servicio
+from Servidor.models import Servicio, Lavadero
 
 
 servicios_data = [
@@ -49,6 +49,22 @@ servicios_data = [
 
 print(f"Cargando servicios actualizados...")
 
+# Obtener o crear el lavadero por defecto
+lavadero, created = Lavadero.objects.get_or_create(
+    nit='900123456',
+    defaults={
+        'nombre': 'EMOTORS POS',
+        'direccion': 'Soacha, Cundinamarca',
+        'telefono': '+57 3001234567',
+        'correo_electronico': 'info@emotors.com'
+    }
+)
+
+if created:
+    print(f"✓ Lavadero '{lavadero.nombre}' creado")
+else:
+    print(f"✓ Usando Lavadero existente: '{lavadero.nombre}'")
+
 # Busca y actualiza los servicios existentes o crea nuevos, los busca por nombre y categoria. Si no existe lo crea. Si existe actualiza su precio y estado.
 for data in servicios_data:
     Servicio.objects.update_or_create(
@@ -56,7 +72,10 @@ for data in servicios_data:
         categoria=data['categoria'],
         defaults={
             'precio': data['precio'],
-            'activo': data.get('activo', True)
+            'activo': data.get('activo', True),
+            'lavadero': lavadero
         }
     )
+
+print(f"✓ {len(servicios_data)} servicios cargados/actualizados")
 
