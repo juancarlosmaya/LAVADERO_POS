@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'tailwind',
     'Servidor',
     'Cliente',
 ]
@@ -128,5 +129,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 # URLS DE AUTENTICACION 
 #Configura dónde redirigir en autenticación.
 LOGIN_URL = 'login' 
-lOGING_REDIRECT_URL = 'dashboard'
+
+# Tailwind Configuration
+TAILWIND_APP_NAME = 'theme'
+
+LOGGING_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'logout'

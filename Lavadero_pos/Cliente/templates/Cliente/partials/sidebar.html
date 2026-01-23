@@ -1,0 +1,100 @@
+{% load static %}
+
+<aside id="layout-menu" class="layout-menu menu-vertical bg-menu-theme">
+  <div class="app-brand demo">
+    <a href="{% url 'dashboard' %}" class="app-brand-link">
+      <span class="app-brand-logo demo">
+        <svg
+          viewBox="0 0 25 42"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          <defs>
+            <path
+              d="M13.7071045,0.5 C6.0147235,0.5 0.5,5.98772511 0.5,13.5862068 L0.5,27.2496644 C0.5,34.8481461 6.0147235,40.5 13.7071045,40.5 C21.3994856,40.5 27,34.8481461 27,27.2496644 L27,13.5862068 C27,5.98772511 21.3994856,0.5 13.7071045,0.5 Z"
+              id="path-1"
+            ></path>
+            <filter
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+              filterUnits="objectBoundingBox"
+              id="filter-2"
+            >
+              <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+              <feGaussianBlur stdDeviation="3.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+              <feColorMatrix
+                values="0 0 0 0 0.359180953 0 0 0 0 0.575211693 0 0 0 0 0.809357541 0 0 0 0.3 0"
+                type="matrix"
+                in="shadowBlurOuter1"
+              ></feColorMatrix>
+            </filter>
+          </defs>
+          <g id="Brand-Logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <g id="Group" transform="translate(2.000000, 1.000000)">
+              <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+              <use fill="#696CFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+          </g>
+        </svg>
+      </span>
+      <span class="app-brand-text demo menu-text fw-bolder ms-2">EMOTORS</span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+      <i class="bx bx-chevron-left bx-sm align-middle"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  <ul class="menu-inner py-1 ps-0">
+    <!-- Dashboard -->
+    <li class="menu-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <a href="{% url 'dashboard' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <div data-i18n="Analytics">Dashboard</div>
+      </a>
+    </li>
+
+    <!-- Orders Section -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Órdenes</span>
+    </li>
+
+    <li class="menu-item {% if request.resolver_match.url_name == 'nueva_orden' %}active{% endif %}">
+      <a href="{% url 'nueva_orden' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-plus-circle"></i>
+        <div data-i18n="Create">Nueva Orden</div>
+      </a>
+    </li>
+
+    <li class="menu-item {% if request.resolver_match.url_name == 'estado_servicios' %}active{% endif %}">
+      <a href="{% url 'estado_servicios' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-list-check"></i>
+        <div data-i18n="Status">Estado de Servicios</div>
+      </a>
+    </li>
+
+    <!-- Account Section -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Cuenta</span>
+    </li>
+
+    <li class="menu-item">
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-user"></i>
+        <div data-i18n="Account">Cuenta</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="{% url 'logout' %}" class="menu-link">
+            <div data-i18n="Logout">Cerrar Sesión</div>
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</aside>

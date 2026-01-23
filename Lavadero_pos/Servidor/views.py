@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero
 from .serializers import (
     ClienteSerializer, 
@@ -25,6 +27,17 @@ class VehiculoViewSet(viewsets.ModelViewSet):
 class ServicioViewSet(viewsets.ModelViewSet):
     queryset = Servicio.objects.all()
     serializer_class = ServicioSerializer
+    
+    @action(detail=False, methods=['get'], url_path='por-tipo/(?P<tipo_id>[^/.]+)')
+    def por_tipo(self, request, tipo_id=None):
+        """Obtener servicios filtrados por tipo de vehículo"""
+        try:
+            # Obtener el tipo de vehículo
+            servicios = Servicio.objects.filter(categoria=tipo_id)
+            serializer = self.get_serializer(servicios, many=True)
+            return Response({'servicios': serializer.data})
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 class OrdenViewSet(viewsets.ModelViewSet):
     queryset = Orden.objects.all()

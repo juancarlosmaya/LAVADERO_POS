@@ -1,51 +1,124 @@
 {% extends 'Cliente/base.html' %}
+{% load static %}
 
-{% block title %}Lavadero POS - Dashboard{% endblock %}
-
-
+{% block title %}Dashboard - EMOTORS POS{% endblock %}
 
 {% block content %}
-
-<body class="dashboard-page">
-    <div class="container">
-        <div class="logo-container">
-            <div class="logo-circle">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                        d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2">
-                    </path>
-                    <circle cx="7" cy="17" r="2"></circle>
-                    <path d="M9 17h6"></path>
-                    <circle cx="17" cy="17" r="2"></circle>
-                </svg>
-            </div>
-            <h1>{{ lavadero.nombre|default:"EMOTORS POS" }}</h1>
-            <p>Sistema de Gestión de Lavadero</p>
-        </div>
-
-        <div class="menu">
-            <a href="/nueva-orden/" class="btn btn-primary">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Nueva Orden de Lavado
-            </a>
-
-            <a href="/estado-servicios/" class="btn btn-secondary">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                Estado de Servicios
-            </a>
-        </div>
+<div class="row">
+  <!-- Tarjeta de Bienvenida -->
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">¡Bienvenido de nuevo! </h5>
+        <p class="mb-0">Sistema de Gestión Integral de Lavadero - {{ lavadero.nombre|default:"" }}</p>
+      </div>
     </div>
-</body>
+  </div>
+
+  <!-- Tarjeta Nueva Orden -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div style="width: 80px; height: 80px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h5 class="card-title mb-2">Nueva Orden</h5>
+        <p class="card-text mb-4">Crear una nueva orden de lavado para vehículos</p>
+        <a href="{% url 'nueva_orden' %}" class="btn btn-primary">Crear Orden</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta Estado de Servicios -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div style="width: 80px; height: 80px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h5 class="card-title mb-2">Estado de Servicios</h5>
+        <p class="card-text mb-4">Consultar órdenes completadas y en proceso</p>
+        <a href="{% url 'estado_servicios' %}" class="btn btn-success">Ver Estado</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Información -->
+
+  {% if nombre_grupo_usuario == "administrador" %}
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div style="width: 80px; height: 80px; background-color: #17a2b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+          <i class="fas fa-building"></i>
+        </div>
+        <h5 class="card-title mb-2">Información</h5>
+        <p class="card-text mb-4">Detalles del lavadero y configuración</p>
+        <a href="#" class="btn btn-info disabled">Detalles</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+<!-- Información del Lavadero -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bx bx-building"></i> Información del Lavadero
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 col-lg-3 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="badge badge-center rounded-pill bg-label-primary p-3 me-3">
+                <i class="bx bx-building bx-sm"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-nowrap">Nombre</h6>
+                <small class="text-muted">{{ lavadero.nombre|default:"No especificado" }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="badge badge-center rounded-pill bg-label-success p-3 me-3">
+                <i class="bx bx-id-card bx-sm"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-nowrap">NIT</h6>
+                <small class="text-muted">{{ lavadero.nit|default:"No especificado" }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="badge badge-center rounded-pill bg-label-warning p-3 me-3">
+                <i class="bx bx-phone bx-sm"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-nowrap">Teléfono</h6>
+                <small class="text-muted">{{ lavadero.telefono|default:"No especificado" }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3 mb-3">
+            <div class="d-flex align-items-center">
+              <div class="badge badge-center rounded-pill bg-label-danger p-3 me-3">
+                <i class="bx bx-map bx-sm"></i>
+              </div>
+              <div>
+                <h6 class="mb-0 text-nowrap">Ubicación</h6>
+                <small class="text-muted">{{ lavadero.direccion|default:"No especificado" }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

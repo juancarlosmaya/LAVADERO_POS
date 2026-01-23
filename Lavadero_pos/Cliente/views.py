@@ -8,7 +8,11 @@ from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    return render(request, 'Cliente/dashboard.html')
+    grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else None  # Extrae el nombre
+    
+    lavadero = Lavadero.objects.first()
+    return render(request, 'Cliente/dashboard.html', {'lavadero': lavadero, 'nombre_grupo_usuario': nombre_grupo_usuario})
 
 def vista_test_bluetooth(request):
     return render(request, 'Cliente/impresion_test_ble.html')
@@ -104,7 +108,8 @@ def estado_servicios(request):
         'total_dia': total_periodo,
         'fecha': hoy,
         'titulo': titulo_periodo,
-        'periodo_actual': periodo
+        'periodo': periodo,
+        'lavadero': Lavadero.objects.first()
     })
 
 def login_view(request):
@@ -125,3 +130,7 @@ def login_view(request):
     else:
         formulario = loginFormulario()
     return render(request, 'Cliente/login.html', {'formulario': formulario})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')

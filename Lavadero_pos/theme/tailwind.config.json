@@ -1,0 +1,6 @@
+{
+  "content": [
+    "../../Client/templates/**/*.html",
+    "../../*/templates/**/*.html"
+  ]
+}

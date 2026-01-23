@@ -1,83 +1,165 @@
 {% extends 'Cliente/base.html' %}
+{% load static %}
 
-{% block title %}Estado de Servicios - Lavadero POS{% endblock %}
+{% block title %}Estado de Servicios - EMOTORS POS{% endblock %}
 
 {% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Estado de Servicios</li>
+      </ol>
+    </nav>
+  </div>
+</div>
 
-<body class="estado-servicios-page">
-    <div class="estado-container">
-        <div class="header-estado">
-            <h1>{{ lavadero.nombre|default:"Estado de Servicios" }}: {{ titulo }}</h1>
-            <div class="filtros">
-                <a href="?periodo=dia" class="filtro-btn {% if periodo_actual == 'dia' %}activo{% endif %}">Hoy</a>
-                <a href="?periodo=semana" class="filtro-btn {% if periodo_actual == 'semana' %}activo{% endif %}">Esta
-                    Semana</a>
-                <a href="?periodo=mes" class="filtro-btn {% if periodo_actual == 'mes' %}activo{% endif %}">Este Mes</a>
-                <a href="?periodo=anio" class="filtro-btn {% if periodo_actual == 'anio' %}activo{% endif %}">Este
-                    Año</a>
-            </div>
-        </div>
+<div class="row">
+  <div class="col-12">
+    <h4 class="mb-2"><i class="bx bx-graph-up me-2"></i>Estado de Servicios</h4>
+    <p class="text-muted">{{ lavadero.nombre|default:"Lavadero" }} - {{ titulo }}</p>
+  </div>
+</div>
 
-        {% if ordenes %}
-        <div class="ordenes-list">
-            {% for orden in ordenes %}
-            <div class="orden-card">
-                <div class="orden-header">
-                    <span class="orden-numero">Orden #{{ orden.id }}</span>
-                    <span class="orden-estado estado-completado">Completada</span>
-                </div>
-
-                <div class="orden-detalles">
-                    <div class="detalle">
-                        <div class="detalle-label">Placa</div>
-                        <div class="detalle-valor">{{ orden.vehiculo.placa }}</div>
-                    </div>
-                    <div class="detalle">
-                        <div class="detalle-label">Tipo Vehículo</div>
-                        <div class="detalle-valor">{{ orden.vehiculo.get_tipo_display }}</div>
-                    </div>
-                    <div class="detalle">
-                        <div class="detalle-label">Fecha</div>
-                        <div class="detalle-valor">{{ orden.fecha_creacion|date:"d M, H:i" }}</div>
-                    </div>
-                </div>
-
-                <div class="servicios-orden">
-                    <div class="servicios-titulo">Servicios Prestados</div>
-                    {% for s in orden.servicios.all %}
-                    <div class="servicio-item">
-                        <span class="servicio-nombre">{{ s.nombre }}</span>
-                        <span class="servicio-precio">${{ s.precio|floatformat:0 }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <div class="orden-total">
-                    <span class="total-label">Total:</span>
-                    <span class="total-monto">${{ orden.total_calculado|floatformat:0 }}</span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="resumen-periodo">
-            <h2>Resumen del Período: {{ titulo }}</h2>
-            <p style="color: var(--text-muted); margin: 10px 0;">Total de Ingresos</p>
-            <div class="resumen-total">${{ total_dia|floatformat:0 }}</div>
-        </div>
-        {% else %}
-        <div class="ordenes-vacio">
-            <p>No hay servicios registrados para este período</p>
-            <p style="font-size: 14px;">{{ titulo }}</p>
-        </div>
-        {% endif %}
-
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="/"
-                style="display: inline-block; padding: 12px 24px; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                ← Volver al Dashboard
-            </a>
-        </div>
+<!-- Filtros por período -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="btn-group" role="group">
+      <a href="?periodo=dia" class="btn btn-sm {% if periodo == 'dia' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-day me-1"></i> Hoy
+      </a>
+      <a href="?periodo=semana" class="btn btn-sm {% if periodo == 'semana' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-week me-1"></i> Esta Semana
+      </a>
+      {% if nombre_grupo_usuario != "administrador" %}
+      <a href="?periodo=mes" class="btn btn-sm {% if periodo == 'mes' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-month me-1"></i> Este Mes
+      </a>
+      <a href="?periodo=anio" class="btn btn-sm {% if periodo == 'anio' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-range me-1"></i> Este Año
+      </a>
+      {% endif %}
     </div>
-</body>
+  </div>
+</div>
+
+{% if ordenes %}
+  <!-- Resumen del período -->
+  <div class="row mb-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body pb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="content-left">
+              <span class="text-muted d-block mb-2">Total de Ingresos</span>
+              <div class="display-6 text-success">{{ total_dia|floatformat:0|add:"$" }}</div>
+            </div>
+            <div style="width: 70px; height: 70px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fa fa-dollar-sign" style="font-size: 32px; color: white;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card">
+        <div class="card-body pb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="content-left">
+              <span class="text-muted d-block mb-2">Total de Órdenes</span>
+              <div class="display-6 text-primary">{{ ordenes|length }}</div>
+            </div>
+            <div style="width: 70px; height: 70px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fa fa-list-check" style="font-size: 32px; color: white;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de órdenes -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Detalle de Órdenes</h5>
+        </div>
+        <div class="table-responsive text-nowrap">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>#Orden</th>
+                <th>Vehículo</th>
+                <th>Placa</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Servicios</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for orden in ordenes %}
+              <tr>
+                <td>
+                  <span class="badge bg-primary">#{{ orden.id }}</span>
+                </td>
+                <td class="fw-bold">{{ orden.vehiculo.get_tipo_display }}</td>
+                <td><span class="text-uppercase fw-bold">{{ orden.vehiculo.placa }}</span></td>
+                <td>
+                  {% if orden.estado == 'completada' %}
+                    <span class="badge bg-success">
+                      <i class="bx bx-check-circle me-1"></i>Completada
+                    </span>
+                  {% elif orden.estado == 'pendiente' %}
+                    <span class="badge bg-warning">
+                      <i class="bx bx-clock me-1"></i>Pendiente
+                    </span>
+                  {% elif orden.estado == 'cancelada' %}
+                    <span class="badge bg-danger">
+                      <i class="bx bx-x-circle me-1"></i>Cancelada
+                    </span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ orden.estado }}</span>
+                  {% endif %}
+                </td>
+                <td><small class="text-muted">{{ orden.fecha_creacion|date:"d/m/y H:i" }}</small></td>
+                <td>
+                  <small>
+                    {% for servicio in orden.servicios.all %}
+                      <span class="badge bg-info me-1 mb-1">{{ servicio.nombre }}</span>
+                    {% endfor %}
+                  </small>
+                </td>
+                <td>
+                  <strong class="text-success">${{ orden.total_calculado|floatformat:0 }}</strong>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <!-- Mensaje vacío -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <i class="bx bx-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-muted fw-bold mt-3">No hay servicios registrados</h5>
+          <p class="text-muted mb-0">Para el período: <strong>{{ titulo }}</strong></p>
+          <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">
+              <i class="bx bx-arrow-back me-2"></i>Volver al Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}
