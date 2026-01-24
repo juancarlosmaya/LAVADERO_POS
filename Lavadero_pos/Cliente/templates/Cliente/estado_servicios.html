@@ -1,7 +1,7 @@
 {% extends 'Cliente/base.html' %}
 {% load static %}
 
-{% block title %}Estado de Servicios - EMOTORS POS{% endblock %}
+{% block title %}Estado de Servicios - {{ lavadero.nombre|default:"" }}{% endblock %}
 
 {% block content %}
 <div class="row mb-4">

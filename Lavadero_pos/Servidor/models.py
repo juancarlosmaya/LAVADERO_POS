@@ -12,7 +12,7 @@ class Lavadero(models.Model):
         return self.nombre
 
 class Cliente(models.Model):
-    celular = models.CharField(max_length=15, unique=True)
+    celular = models.CharField(max_length=15) # Unique constraint removed to allow multiple clientes with same celular , unique=True
     nombre = models.CharField(max_length=100, blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
@@ -27,7 +27,7 @@ class Vehiculo(models.Model):
         ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
         ('BICICLETA', 'Bicicleta'),
     ]
-    placa = models.CharField(max_length=10, unique=True)
+    placa = models.CharField(max_length=10) # Unique constraint removed to allow multiple vehiculos with same placa , unique=True, 
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)

@@ -1,7 +1,7 @@
 {% extends 'Cliente/base.html' %}
 {% load static %}
 
-{% block title %}Nueva Orden - EMOTORS POS{% endblock %}
+{% block title %}Nueva Orden - {{ lavadero.nombre|default:"" }}{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -45,7 +45,7 @@
                 <div class="col-md-6">
                   <label for="id_placa" class="form-label">Placa del Vehículo</label>
                   <input type="text" class="form-control {% if vehiculo_form.placa.errors %}is-invalid{% endif %}" 
-                    id="id_placa" name="placa" placeholder="ABC-1234" style="text-transform: uppercase;">
+                    id="id_placa" name="placa" placeholder="ABC-1234" style="text-transform: uppercase;" value="{{vehiculo_form.placa.value|default:''}}">
                   {% if vehiculo_form.placa.errors %}
                     <div class="invalid-feedback">{{ vehiculo_form.placa.errors.0 }}</div>
                   {% endif %}
@@ -69,7 +69,7 @@
                 <div class="col-md-6">
                   <label for="id_marca" class="form-label">Marca</label>
                   <input type="text" class="form-control {% if vehiculo_form.marca.errors %}is-invalid{% endif %}" 
-                    id="id_marca" name="marca" placeholder="ej: Mazda">
+                    id="id_marca" name="marca" placeholder="ej: Mazda" value="{{vehiculo_form.marca.value|default:''}}">
                   {% if vehiculo_form.marca.errors %}
                     <div class="invalid-feedback">{{ vehiculo_form.marca.errors.0 }}</div>
                   {% endif %}
@@ -77,7 +77,7 @@
                 <div class="col-md-6">
                   <label for="id_modelo" class="form-label">Modelo</label>
                   <input type="text" class="form-control {% if vehiculo_form.modelo.errors %}is-invalid{% endif %}" 
-                    id="id_modelo" name="modelo" placeholder="ej: 2024">
+                    id="id_modelo" name="modelo" placeholder="ej: 2024" value="{{vehiculo_form.modelo.value|default:''}}">
                   {% if vehiculo_form.modelo.errors %}
                     <div class="invalid-feedback">{{ vehiculo_form.modelo.errors.0 }}</div>
                   {% endif %}
@@ -96,7 +96,7 @@
                 <div class="col-md-6">
                   <label for="id_nombre" class="form-label">Nombre Completo</label>
                   <input type="text" class="form-control {% if cliente_form.nombre.errors %}is-invalid{% endif %}" 
-                    id="id_nombre" name="nombre" placeholder="Nombre del cliente">
+                    id="id_nombre" name="nombre" placeholder="Nombre del cliente" value="{{cliente_form.nombre.value|default:''}}">
                   {% if cliente_form.nombre.errors %}
                     <div class="invalid-feedback">{{ cliente_form.nombre.errors.0 }}</div>
                   {% endif %}
@@ -104,7 +104,7 @@
                 <div class="col-md-6">
                   <label for="id_celular" class="form-label">Número de Celular</label>
                   <input type="text" class="form-control {% if cliente_form.celular.errors %}is-invalid{% endif %}" 
-                    id="id_celular" name="celular" placeholder="3001234567">
+                    id="id_celular" name="celular" placeholder="3001234567" value="{{cliente_form.celular.value|default:''}}">
                   {% if cliente_form.celular.errors %}
                     <div class="invalid-feedback">{{ cliente_form.celular.errors.0 }}</div>
                   {% endif %}
@@ -136,7 +136,7 @@
               <label for="id_observaciones" class="form-label">Observaciones</label>
               <textarea class="form-control {% if orden_form.observaciones.errors %}is-invalid{% endif %}" 
                 id="id_observaciones" name="observaciones" rows="4" 
-                placeholder="Detalles especiales o instrucciones sobre el lavado"></textarea>
+                placeholder="Detalles especiales o instrucciones sobre el lavado">{{ orden_form.observaciones.value|default_if_none:'' }}</textarea>
               <small class="form-text text-muted">Detalles especiales o instrucciones sobre el lavado</small>
               {% if orden_form.observaciones.errors %}
                 <div class="invalid-feedback">{{ orden_form.observaciones.errors.0 }}</div>
@@ -162,7 +162,7 @@
           <!-- BOTONES DE ACCIÓN -->
           <div class="row">
             <div class="col-6">
-              <button type="submit" class="btn btn-primary w-100">
+              <button type="submit" class="btn btn-primary w-100" id="guardarImprimirBtn">
                 <i class="bx bx-check-circle me-2"></i>Guardar e Imprimir Orden
               </button>
             </div>

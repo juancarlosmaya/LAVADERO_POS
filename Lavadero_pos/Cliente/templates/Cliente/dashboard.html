@@ -1,7 +1,7 @@
 {% extends 'Cliente/base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - EMOTORS POS{% endblock %}
+{% block title %}Dashboard - {{ lavadero.nombre|default:"" }}{% endblock %}
 
 {% block content %}
 <div class="row">

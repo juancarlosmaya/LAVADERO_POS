@@ -4,439 +4,190 @@
 {% block title %}Ticket de Orden - LAVADERO POS{% endblock %}
 
 {% block content %}
-<div class="container-xxl flex-grow-1 container-p-y">
-  <!-- Breadcrumb -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-      <li class="breadcrumb-item active">Ticket Orden</li>
-    </ol>
-  </nav>
 
-  <!-- Main Card -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Orden #{{ orden.id }}</h5>
-          <button class="btn btn-sm btn-primary" id="imprimirBtn" onclick="imprimirPorBluetooth()">
-            <i class="bx bx-printer me-1"></i> Imprimir
-          </button>
+
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .ticket {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: sans-serif;
+        }
+
+        .btn-print {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-home {
+            background: #6c757d;
+            color: white;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+
+
+ <div class="ticket" id="ticketContent">
+        <div class="header">
+            <strong>{{ lavadero.nombre|default:"" }}</strong><br>
+            Autolavado Profesional<br>
+            Soacha, Cundinamarca
         </div>
-        <div class="card-body">
-          <!-- Order Header Info -->
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label text-muted small">FECHA Y HORA</label>
-                <p class="mb-0 fw-semibold">{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</p>
-              </div>
-              <div class="mb-3">
-                <label class="form-label text-muted small">ESTADO</label>
-                <p class="mb-0">
-                  {% if orden.estado == "completada" %}
-                    <span class="badge bg-success">COMPLETADA</span>
-                  {% elif orden.estado == "pendiente" %}
-                    <span class="badge bg-warning">PENDIENTE</span>
-                  {% elif orden.estado == "cancelada" %}
-                    <span class="badge bg-danger">CANCELADA</span>
-                  {% endif %}
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label class="form-label text-muted small">ATENDIDO POR</label>
-                <p class="mb-0 fw-semibold">{{ orden.usuario.username|default:"Sistema" }}</p>
-              </div>
-              <div class="mb-3">
-                <label class="form-label text-muted small">LAVADERO</label>
-                <p class="mb-0 fw-semibold">{{ orden.lavadero.nombre }}</p>
-              </div>
-            </div>
-          </div>
-
-          <hr class="my-4">
-
-          <!-- Vehicle Info -->
-          <div class="mb-4">
-            <h6 class="text-uppercase fw-bold text-muted mb-3">Información del Vehículo</h6>
-            <div class="row">
-              <div class="col-md-3">
-                <label class="form-label text-muted small">PLACA</label>
-                <p class="mb-0 fw-semibold">{{ orden.vehiculo.placa }}</p>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label text-muted small">TIPO</label>
-                <p class="mb-0 fw-semibold">{{ orden.vehiculo.tipo }}</p>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label text-muted small">MARCA</label>
-                <p class="mb-0 fw-semibold">{{ orden.vehiculo.marca }}</p>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label text-muted small">MODELO</label>
-                <p class="mb-0 fw-semibold">{{ orden.vehiculo.modelo }}</p>
-              </div>
-            </div>
-          </div>
-
-          <hr class="my-4">
-
-          <!-- Client Info -->
-          <div class="mb-4">
-            <h6 class="text-uppercase fw-bold text-muted mb-3">Información del Cliente</h6>
-            <div class="row">
-              <div class="col-md-6">
-                <label class="form-label text-muted small">NOMBRE</label>
-                <p class="mb-0 fw-semibold">{{ orden.cliente.nombre }}</p>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label text-muted small">CELULAR</label>
-                <p class="mb-0 fw-semibold">{{ orden.cliente.celular }}</p>
-              </div>
-            </div>
-          </div>
-
-          <hr class="my-4">
-
-          <!-- Services -->
-          <div class="mb-4">
-            <h6 class="text-uppercase fw-bold text-muted mb-3">Servicios Contratados</h6>
-            <div class="table-responsive">
-              <table class="table table-borderless">
-                <thead class="table-light">
-                  <tr>
-                    <th>Servicio</th>
-                    <th class="text-end">Valor Unitario</th>
-                    <th class="text-end">Cantidad</th>
-                    <th class="text-end">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for detalle in orden.ordendetalle_set.all %}
-                  <tr>
-                    <td>
-                      <strong>{{ detalle.servicio.nombre }}</strong>
-                      <br>
-                      <small class="text-muted">{{ detalle.servicio.descripcion }}</small>
-                    </td>
-                    <td class="text-end">${{ detalle.servicio.precio|floatformat:0 }}</td>
-                    <td class="text-end">{{ detalle.cantidad }}</td>
-                    <td class="text-end">
-                      <strong>${{ detalle.subtotal|floatformat:0 }}</strong>
-                    </td>
-                  </tr>
-                  {% empty %}
-                  <tr>
-                    <td colspan="4" class="text-center text-muted py-3">
-                      No hay servicios registrados
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <hr class="my-4">
-
-          <!-- Observations -->
-          {% if orden.observaciones %}
-          <div class="mb-4">
-            <h6 class="text-uppercase fw-bold text-muted mb-3">Observaciones</h6>
-            <div class="alert alert-info border-0 mb-0">
-              <p class="mb-0">{{ orden.observaciones }}</p>
-            </div>
-          </div>
-
-          <hr class="my-4">
-          {% endif %}
-
-          <!-- Summary -->
-          <div class="row justify-content-end">
-            <div class="col-md-4">
-              <div class="table-responsive">
-                <table class="table table-borderless">
-                  <tbody>
-                    <tr class="border-top">
-                      <td class="fw-semibold">Subtotal:</td>
-                      <td class="text-end">${{ orden.total|floatformat:0 }}</td>
-                    </tr>
-                    {% if orden.descuento %}
-                    <tr>
-                      <td class="fw-semibold text-danger">Descuento:</td>
-                      <td class="text-end text-danger">-${{ orden.descuento|floatformat:0 }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr class="border-top border-2">
-                      <td class="fw-bold text-lg">TOTAL:</td>
-                      <td class="text-end fw-bold text-lg text-primary">${{ orden.total_final|floatformat:0 }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Payment Info -->
-          {% if orden.pago %}
-          <hr class="my-4">
-          <div class="mb-4">
-            <h6 class="text-uppercase fw-bold text-muted mb-3">Información de Pago</h6>
-            <div class="row">
-              <div class="col-md-4">
-                <label class="form-label text-muted small">MÉTODO DE PAGO</label>
-                <p class="mb-0 fw-semibold">{{ orden.pago.metodo }}</p>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-muted small">ESTADO</label>
-                <p class="mb-0">
-                  {% if orden.pago.estado == "pagado" %}
-                    <span class="badge bg-success">PAGADO</span>
-                  {% elif orden.pago.estado == "pendiente" %}
-                    <span class="badge bg-warning">PENDIENTE</span>
-                  {% endif %}
-                </p>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label text-muted small">FECHA DE PAGO</label>
-                <p class="mb-0 fw-semibold">{{ orden.pago.fecha_pago|date:"d/m/Y H:i"|default:"N/A" }}</p>
-              </div>
-            </div>
-          </div>
-          {% endif %}
-
+        <div class="divider"></div>
+        <div class="row"><strong>ORDEN:</strong> <span>#{{ orden.id }}</span></div>
+        <div class="row"><strong>FECHA:</strong> <span>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</span></div>
+        <div class="row"><strong>PLACA:</strong> <span>{{ orden.vehiculo.placa }}</span></div>
+        {% if orden.vehiculo.cliente %}
+        <div class="row"><strong>CLIENTE:</strong> <span>{{ orden.vehiculo.cliente.nombre|default:"Cliente" }}</span>
         </div>
-      </div>
+        {% endif %}
+        <div class="divider"></div>
+        <strong>SERVICIOS:</strong>
+        {% for servicio in orden.servicios.all %}
+        <div class="row">
+            <span>{{ servicio.nombre }}</span>
+            <span>${{ servicio.precio|floatformat:0 }}</span>
+        </div>
+        {% endfor %}
+        <div class="divider"></div>
+        {% if orden.observaciones %}
+        <p><strong>Obs:</strong> {{ orden.observaciones }}</p>
+        <div class="divider"></div>
+        {% endif %}
+        <div class="footer">
+            ¡Gracias por preferir EMOTORS!<br>
+            Conserva este tiquet para retirar tu vehiculo.
+        </div>
     </div>
-  </div>
 
-  <!-- Action Buttons -->
-  <div class="row mt-4">
-    <div class="col-12 d-flex gap-2 justify-content-center">
-      <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-        <i class="bx bx-arrow-back me-1"></i> Volver al Dashboard
-      </a>
-      <button class="btn btn-primary" onclick="window.print()">
-        <i class="bx bx-printer me-1"></i> Imprimir Ticket
-      </button>
-      {% if orden.estado == "completada" and orden.pago.estado != "pagado" %}
-      <a href="{% url 'registrar_pago' orden.id %}" class="btn btn-success">
-        <i class="bx bx-check me-1"></i> Registrar Pago
-      </a>
-      {% endif %}
+    <div class="btn-group">
+        <button id="btnConnect" class="btn btn-print" onclick="connectAndPrint()">🔍 1. Conectar e Imprimir</button>
+        <a href="/nueva-orden/" class="btn btn-new">➕ Nueva Orden</a>
+        <a href="/" class="btn btn-home">🏠 Ir al Inicio</a>
     </div>
-  </div>
+    <div id="status" class="status-msg"></div>
 
-</div>
+    <script>
+        let printCharacteristic = null;
 
-<!-- Print Styles -->
-<style media="print">
-  .breadcrumb, .btn, .card-header {
-    display: none !important;
-  }
-  
-  body {
-    background: white;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .card {
-    border: none;
-    box-shadow: none;
-  }
-  
-  .card-body {
-    padding: 0;
-  }
-  
-  .table {
-    margin-bottom: 0;
-  }
-  
-  @page {
-    margin: 10mm;
-  }
-</style>
+        async function connectAndPrint() {
+            const status = document.getElementById('status');
+            const btn = document.getElementById('btnConnect');
 
-<style>
-  .print-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
+            try {
+                if (!navigator.bluetooth) {
+                    throw new Error("Bluetooth no soportado en este navegador.");
+                }
 
-  .print-modal-overlay.active {
-    display: flex;
-  }
+                status.innerText = "Buscando impresora...";
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+                });
 
-  .print-modal {
-    background: white;
-    border-radius: 8px;
-    padding: 30px;
-    text-align: center;
-    min-width: 300px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
+                status.innerText = "Conectando...";
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+                printCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
 
-  .print-modal h5 {
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
+                status.innerText = "Imprimiendo...";
+                await sendPrintData();
+                status.innerText = "✅ Impresión enviada.";
 
-  .print-modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+            } catch (error) {
+                console.error(error);
+                status.innerText = "❌ Error: " + error.message;
+            }
+        }
 
-  .print-modal button {
-    flex: 1;
-    min-width: 120px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-  }
+        async function sendPrintData() {
+            const encoder = new TextEncoder();
 
-  .btn-navegador {
-    background-color: #007bff;
-    color: white;
-  }
+            // Comandos ESC/POS muy básicos
+            const esc = "\x1B";
+            const center = esc + "a1";
+            const left = esc + "a0";
+            const boldOn = esc + "E1";
+            const boldOff = esc + "E0";
+            const init = esc + "@";
 
-  .btn-navegador:hover {
-    background-color: #0056b3;
-  }
+            let text = init + center + boldOn + "EMOTORS POS\n" + boldOff +
+                "Autolavado Profesional\n" +
+                "--------------------------------\n" +
+                left +
+                "ORDEN: #{{ orden.id }}\n" +
+                "FECHA: {{ orden.fecha_creacion|date:'d/m/y H:i' }}\n" +
+                "PLACA: {{ orden.vehiculo.placa }}\n" +
+                "--------------------------------\n" +
+                "SERVICIOS:\n";
 
-  .btn-bluetooth {
-    background-color: #28a745;
-    color: white;
-  }
+            {% for servicio in orden.servicios.all %}
+            text += "- {{ servicio.nombre }}  ${{ servicio.precio|floatformat:0 }}\n";
+            {% endfor %}
 
-  .btn-bluetooth:hover {
-    background-color: #218838;
-  }
+            text += "--------------------------------\n" +
+                center + "¡Gracias por su visita!\n\n\n\n\n";
 
-  .btn-cancelar {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  .btn-cancelar:hover {
-    background-color: #5a6268;
-  }
-
-  #estado {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 5px;
-    display: none;
-    font-size: 14px;
-  }
-
-  #estado.loading {
-    display: block;
-    background-color: #e7f3ff;
-    color: #004085;
-  }
-
-  #estado.success {
-    display: block;
-    background-color: #d4edda;
-    color: #155724;
-  }
-
-  #estado.error {
-    display: block;
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-</style>
-
-<script>
-let connectedDevice = null;
-let printCharacteristic = null;
-
-async function imprimirPorBluetooth() {
-  try {
-    const btn = document.getElementById('imprimirBtn');
-    const estadoOriginal = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="bx bx-loader bx-spin me-1"></i> Conectando...';
-
-    if (!navigator.bluetooth) {
-      throw new Error("Web Bluetooth no soportado en este navegador");
-    }
-
-    // Conectar si no está conectado
-    if (!printCharacteristic) {
-      btn.innerHTML = '<i class="bx bx-loader bx-spin me-1"></i> Buscando impresora...';
-      
-      connectedDevice = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-      });
-
-      btn.innerHTML = '<i class="bx bx-loader bx-spin me-1"></i> Conectando...';
-      const server = await connectedDevice.gatt.connect();
-      const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-      printCharacteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-    }
-
-    btn.innerHTML = '<i class="bx bx-loader bx-spin me-1"></i> Imprimiendo...';
-    
-    const ordenId = {{ orden.id }};
-    const placa = "{{ orden.vehiculo.placa }}";
-    const cliente = "{{ orden.cliente.nombre }}";
-    const total = "{{ orden.total|default:'0' }}";
-    
-    const encoder = new TextEncoder();
-    const text = "\n" +
-      "      EMOTORS POS      \n" +
-      "-----------------------\n" +
-      `Orden #${ordenId}\n` +
-      "-----------------------\n" +
-      `Placa: ${placa}\n` +
-      `Cliente: ${cliente}\n` +
-      "-----------------------\n" +
-      `Total: $${total}\n` +
-      "-----------------------\n" +
-      `${new Date().toLocaleString('es-CO')}\n` +
-      "\n\n\n";
-
-    const data = encoder.encode(text);
-    await printCharacteristic.writeValue(data);
-    
-    btn.innerHTML = '<i class="bx bx-check me-1"></i> ¡Impreso!';
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.innerHTML = estadoOriginal;
-    }, 2000);
-
-  } catch (error) {
-    const btn = document.getElementById('imprimirBtn');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bx bx-printer me-1"></i> Imprimir';
-    
-    let mensajeError = error.message;
-    if (error.name === 'NotFoundError') {
-      mensajeError = 'Dispositivo no encontrado. Asegúrate de que la impresora esté encendida.';
-    }
-    alert('Error: ' + mensajeError);
-    printCharacteristic = null;
-  }
-}
-</script>
+            const data = encoder.encode(text);
+            await printCharacteristic.writeValue(data);
+        }
+    </script>
 
 {% endblock %}
