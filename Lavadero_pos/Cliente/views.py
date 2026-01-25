@@ -50,7 +50,7 @@ def crear_orden(request):
             orden = orden_form.save(commit=False)
             orden.vehiculo = vehiculo
             orden.cliente = cliente
-            orden.lavadero = Lavadero.objects.first()
+            orden.lavadero = request.user.lavaderos
             orden.save()
             
             # Agregar servicios

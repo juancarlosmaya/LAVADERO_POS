@@ -6,7 +6,74 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Lavadero_pos.settings')
 django.setup()
 
-from Servidor.models import Servicio, Lavadero
+from Servidor.models import Servicio, Lavadero, PerfilUsuario
+from django.contrib.auth.models import User
+
+# Crear usuario superusuario
+admin_username = "juanc"
+admin_password = "123"
+if not User.objects.filter(username=admin_username).exists():
+    User.objects.create_superuser(username=admin_username, password=admin_password, email="admin@lavadero.com")
+    print(f"✓ Superusuario '{admin_username}' creado con contraseña '{admin_password}'")
+else:
+    print(f"✓ Superusuario '{admin_username}' ya existe")
+
+# Crear usuario administrador Emotors
+username = "emotorsadministrador"
+password = "emotors2026"
+#email = "admin@emotors.com"
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_user(username=username, password=password)
+    print(f"✓ Usuario administrador '{username}' creado con contraseña '{password}'")
+else:
+    print(f"✓ Usuario administrador '{username}' ya existe")
+
+# Crear usuario operador Emotors
+username = "emotorsoperador"
+password = "emotors2026"
+#email = "admin@emotors.com"
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_user(username=username, password=password)
+    print(f"✓ Usuario operador '{username}' creado con contraseña '{password}'")
+else:
+    print(f"✓ Usuario operador '{username}' ya existe")
+
+# Obtener o crear el lavadero por defecto
+if not Lavadero.objects.filter(nit='900123456').exists():
+    Lavadero.objects.get_or_create(
+        nombre= 'EMOTORS POS',
+        nit = '900123456',
+        direccion = 'Soacha, Cundinamarca',
+        telefono = '+57 3001234567',
+        correo_electronico ='info@emotors.com')
+    print("✓ Lavadero 'EMOTORS POS' creado")
+else:
+    print("✓ Lavadero 'EMOTORS POS' ya existe")
+
+# Obtener o crear el perfil de usuario para el administrador
+lavadero = Lavadero.objects.get(nit='900123456')
+admin_user = User.objects.get(username="emotorsadministrador")
+if not PerfilUsuario.objects.filter(usuario=admin_user).exists():
+    PerfilUsuario.objects.create(
+        usuario=admin_user,
+        lavadero=lavadero,
+        rol='admin'
+    )
+    print(f"✓ Perfil de usuario para '{admin_user.username}' creado")
+
+# 
+operador_user = User.objects.get(username="emotorsoperador")
+if not PerfilUsuario.objects.filter(usuario=operador_user).exists():
+    PerfilUsuario.objects.create(
+        usuario=operador_user,
+        lavadero=lavadero,
+        rol='operador'
+    )
+    print(f"✓ Perfil de usuario para '{operador_user.username}' creado")   
+
+
 
 
 servicios_data = [
@@ -49,33 +116,19 @@ servicios_data = [
 
 print(f"Cargando servicios actualizados...")
 
-# Obtener o crear el lavadero por defecto
-lavadero, created = Lavadero.objects.get_or_create(
-    nit='900123456',
-    defaults={
-        'nombre': 'EMOTORS POS',
-        'direccion': 'Soacha, Cundinamarca',
-        'telefono': '+57 3001234567',
-        'correo_electronico': 'info@emotors.com'
-    }
-)
 
-if created:
-    print(f"✓ Lavadero '{lavadero.nombre}' creado")
-else:
-    print(f"✓ Usando Lavadero existente: '{lavadero.nombre}'")
-
+ladadero = Lavadero.objects.get(nit='900123456')
 # Busca y actualiza los servicios existentes o crea nuevos, los busca por nombre y categoria. Si no existe lo crea. Si existe actualiza su precio y estado.
 for data in servicios_data:
     Servicio.objects.update_or_create(
         nombre=data['nombre'],
+        precio=data['precio'],
         categoria=data['categoria'],
-        defaults={
-            'precio': data['precio'],
-            'activo': data.get('activo', True),
-            'lavadero': lavadero
-        }
+        activo=True,
+        lavadero=lavadero
     )
+
+
 
 print(f"✓ {len(servicios_data)} servicios cargados/actualizados")
 

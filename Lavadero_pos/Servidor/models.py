@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User 
 
 class Lavadero(models.Model):
     nombre = models.CharField(max_length=100)
@@ -11,10 +12,19 @@ class Lavadero(models.Model):
     def __str__(self):
         return self.nombre
 
+# Extender usuario con relación al lavadero
+class PerfilUsuario(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='usuarios')
+    rol = models.CharField(max_length=50, choices=[('admin', 'Administrador'), ('operador', 'Operador')])
+    def __str__(self):
+        return f"{self.usuario.username} - {self.rol} en {self.lavadero.nombre}"
+
 class Cliente(models.Model):
     celular = models.CharField(max_length=15) # Unique constraint removed to allow multiple clientes with same celular , unique=True
     nombre = models.CharField(max_length=100, blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='clientes')
 
     def __str__(self):
         return f"{self.nombre or 'Sin Nombre'} ({self.celular})"
@@ -32,7 +42,7 @@ class Vehiculo(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)
     modelo = models.CharField(max_length=50, blank=True, null=True)
-    Lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='vehiculos')  
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='vehiculos')
     
     def __str__(self):
         return f"{self.placa} - {self.tipo}"

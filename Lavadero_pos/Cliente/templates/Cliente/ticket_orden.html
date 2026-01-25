@@ -88,7 +88,7 @@
         <div class="header">
             <strong>{{ lavadero.nombre|default:"" }}</strong><br>
             Autolavado Profesional<br>
-            Soacha, Cundinamarca
+            {{ lavadero.direccion|default:"" }}
         </div>
         <div class="divider"></div>
         <div class="row"><strong>ORDEN:</strong> <span>#{{ orden.id }}</span></div>
@@ -112,8 +112,9 @@
         <div class="divider"></div>
         {% endif %}
         <div class="footer">
-            ¡Gracias por preferir EMOTORS!<br>
-            Conserva este tiquet para retirar tu vehiculo.
+            ¡Gracias por preferir {{ lavadero.nombre|default:"" }}!<br>
+            Conserva este tiquet para retirar tu vehiculo. 
+            Recuerda reclamar tu vehiculo maximo 30 minutos despues de finalizado el servicio (antes de cobro de parqueadero adicional).
         </div>
     </div>
 
@@ -168,7 +169,7 @@
             const boldOff = esc + "E0";
             const init = esc + "@";
 
-            let text = init + center + boldOn + "EMOTORS POS\n" + boldOff +
+            let text = init + center + boldOn + "{{ lavadero.nombre|default:'EMOTORS POS#' }}\n" + boldOff +
                 "Autolavado Profesional\n" +
                 "--------------------------------\n" +
                 left +

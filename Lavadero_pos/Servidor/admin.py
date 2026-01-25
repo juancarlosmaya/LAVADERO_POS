@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero
+from .models import Cliente, PerfilUsuario, Vehiculo, Servicio, Orden, Pago, Lavadero
 
 # Register your models here.
+admin.site.register(PerfilUsuario)
 admin.site.register(Cliente)
 admin.site.register(Vehiculo)
 admin.site.register(Servicio)
