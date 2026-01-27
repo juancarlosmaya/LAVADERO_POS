@@ -78,6 +78,7 @@ class Orden(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='EN_COLA')
     fecha_creacion = models.DateTimeField(default=timezone.now)
     observaciones = models.TextField(blank=True, null=True)
+    tiempo_inicio_servicio = models.TimeField(blank=True, null=True)
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='ordenes')
 
     def __str__(self):

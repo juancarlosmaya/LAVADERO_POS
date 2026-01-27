@@ -35,8 +35,12 @@ class OrdenForm(forms.ModelForm):
     
     class Meta:
         model = Orden
-        fields = ['observaciones']
+        fields = ['tiempo_inicio_servicio', 'observaciones']
         widgets = {
+            'tiempo_inicio_servicio': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'form-control',
+            }),
             'observaciones': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
                 'rows': 4,

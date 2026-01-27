@@ -139,7 +139,27 @@
             </div>
           </div>
 
-          <!-- SECCIÓN 4: OBSERVACIONES -->
+          <!-- SECCIÓN 4: TIEMPO DE INICIO DEL SERVICIO -->
+          <div class="card mb-4">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bx bx-time me-2"></i>Tiempo de Inicio del Servicio</h6>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="id_tiempo_inicio_servicio" class="form-label">Hora de Inicio</label>
+                  <input type="time" class="form-control {% if orden_form.tiempo_inicio_servicio.errors %}is-invalid{% endif %}" 
+                    id="id_tiempo_inicio_servicio" name="tiempo_inicio_servicio" value="{{ orden_form.tiempo_inicio_servicio.value|default:'' }}">
+                  <small class="form-text text-muted">Hora en que comienza el servicio de lavado</small>
+                  {% if orden_form.tiempo_inicio_servicio.errors %}
+                    <div class="invalid-feedback">{{ orden_form.tiempo_inicio_servicio.errors.0 }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 5: OBSERVACIONES -->
           <div class="card mb-4">
             <div class="card-header bg-light">
               <h6 class="mb-0"><i class="bx bx-chat-left-text me-2"></i>Observaciones Adicionales</h6>

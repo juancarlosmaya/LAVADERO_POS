@@ -7,19 +7,18 @@
 
 
     <style>
-        .ticket-container {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-
         .ticket {
+            font-family: 'Courier New', Courier, monospace;
             max-width: 400px;
             margin: auto;
             background: white;
             padding: 20px;
             border: 1px solid #ccc;
-            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
         }
 
         .header {
@@ -85,8 +84,7 @@
     </style>
 
 
- <div class="ticket-container">
-    <div class="ticket" id="ticketContent">
+ <div class="ticket" id="ticketContent">
         <div class="header">
             <strong>{{ lavadero.nombre|default:"" }}</strong><br>
             Autolavado Profesional<br>
@@ -109,6 +107,11 @@
         </div>
         {% endfor %}
         <div class="divider"></div>
+        <div class="row">
+            <strong>TOTAL:</strong>
+            <strong id="totalDisplay">$0</strong>
+        </div>
+        <div class="divider"></div>
         {% if orden.observaciones %}
         <p><strong>Obs:</strong> {{ orden.observaciones }}</p>
         <div class="divider"></div>
@@ -119,7 +122,6 @@
             Recuerda reclamar tu vehiculo maximo 30 minutos despues de finalizado el servicio (antes de cobro de parqueadero adicional).
         </div>
     </div>
-</div>
 
     <div class="btn-group">
         <button id="btnConnect" class="btn btn-print" onclick="connectAndPrint()">🔍 1. Conectar e Imprimir</button>
@@ -165,6 +167,8 @@
             const encoder = new TextEncoder();
 
             // Comandos ESC/POS muy básicos
+            const condensed = "\x0F";  // Modo comprimido (muy pequeño)
+            const normalMode = "\x12"; // Volver a normal
             const esc = "\x1B";
             const center = esc + "a1";
             const left = esc + "a0";
@@ -173,12 +177,14 @@
             const init = esc + "@";
 
             let text = init + center + boldOn + "{{ lavadero.nombre|default:'EMOTORS POS#' }}\n" + boldOff +
+                condensed +
                 "Autolavado Profesional\n" +
                 "--------------------------------\n" +
                 left +
                 "ORDEN: #{{ orden.id }}\n" +
                 "FECHA: {{ orden.fecha_creacion|date:'d/m/y H:i' }}\n" +
                 "PLACA: {{ orden.vehiculo.placa }}\n" +
+                "CLIENTE: {{ orden.vehiculo.cliente.nombre }}\n" +
                 "--------------------------------\n" +
                 "SERVICIOS:\n";
 
@@ -186,12 +192,39 @@
             text += "- {{ servicio.nombre }}  ${{ servicio.precio|floatformat:0 }}\n";
             {% endfor %}
 
-            text += "--------------------------------\n" +
-                center + "¡Gracias por su visita!\n\n\n\n\n";
+            let total = 0;
+            {% for servicio in orden.servicios.all %}
+            total += {{ servicio.precio }};
+            {% endfor %}
+            
+            let data = encoder.encode(text);
+            await printCharacteristic.writeValue(data);
+           
+            text = init + center  +
+                condensed +"--------------------------------\n" +
+                boldOn + "TOTAL: $" + total.toFixed(0) + "\n" + boldOff +
+                "--------------------------------\n" +
+                "Observaciones: {{orden.observaciones}}\n"+
+                "--------------------------------\n" +
+                center + "Gracias por su visita!\n" +
+                "Conserve este tiquet para\n" +
+                "retirar tu vehiculo. Recuerda\n" +
+                "venir maximo 30 minutos\n"+
+                "despues del lavado (antes del\n"+
+                "cobro de parqueadero adicional)\n\n\n";
 
-            const data = encoder.encode(text);
+            data = encoder.encode(text);
             await printCharacteristic.writeValue(data);
         }
+
+        // Calcular y mostrar total en la página
+        document.addEventListener('DOMContentLoaded', function() {
+            let total = 0;
+            {% for servicio in orden.servicios.all %}
+            total += {{ servicio.precio }};
+            {% endfor %}
+            document.getElementById('totalDisplay').textContent = '$' + total.toFixed(0);
+        });
     </script>
 
 {% endblock %}
