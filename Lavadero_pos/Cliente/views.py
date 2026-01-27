@@ -1,9 +1,12 @@
+from django.test import Client
 from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
 from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm
+import requests
+import json
 
 def dashboard(request):
     if not request.user.is_authenticated:
@@ -61,7 +64,14 @@ def crear_orden(request):
             
             # Agregar servicios
             orden.servicios.set(servicios_ids)
-            
+            server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
+            numero_telefonico ="+57"+cliente.celular
+            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha sido registrada en {lavadero_sesion.nombre}. Gracias por tu confianza."
+            nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message}
+            response = requests.post(server_sms, data=json.dumps(nuevo_mensaje), headers={"Content-Type": "application/json"})
+            print("Respuesta del servidor SMS:", response.text)
+            print("message enviado:", message )
+            print("Número telefónico:", numero_telefonico )
             return redirect('ticket_orden', orden_id=orden.id)
     else:
         vehiculo_form = VehiculoForm()
