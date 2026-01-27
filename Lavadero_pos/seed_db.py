@@ -21,10 +21,12 @@ else:
 # Crear usuario administrador Emotors
 username = "emotorsadministrador"
 password = "emotors2026"
-#email = "admin@emotors.com"
+first_name = "Jesus"
+last_name = "Duarte"
+#email = "admin@demo.com"
 
 if not User.objects.filter(username=username).exists():
-    User.objects.create_user(username=username, password=password)
+    User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
     print(f"✓ Usuario administrador '{username}' creado con contraseña '{password}'")
 else:
     print(f"✓ Usuario administrador '{username}' ya existe")
@@ -32,10 +34,12 @@ else:
 # Crear usuario operador Emotors
 username = "emotorsoperador"
 password = "emotors2026"
+first_name = "Julian Andres"
+last_name = "Apellido Emotors"
 #email = "admin@emotors.com"
 
 if not User.objects.filter(username=username).exists():
-    User.objects.create_user(username=username, password=password)
+    User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
     print(f"✓ Usuario operador '{username}' creado con contraseña '{password}'")
 else:
     print(f"✓ Usuario operador '{username}' ya existe")
@@ -43,14 +47,14 @@ else:
 # Obtener o crear el lavadero por defecto
 if not Lavadero.objects.filter(nit='900123456').exists():
     Lavadero.objects.get_or_create(
-        nombre= 'EMOTORS POS',
+        nombre= 'EMOTORS',
         nit = '900123456',
         direccion = 'Soacha, Cundinamarca',
         telefono = '+57 3001234567',
         correo_electronico ='info@emotors.com')
-    print("✓ Lavadero 'EMOTORS POS' creado")
+    print("✓ Lavadero 'EMOTORS' creado")
 else:
-    print("✓ Lavadero 'EMOTORS POS' ya existe")
+    print("✓ Lavadero 'EMOTORS' ya existe")
 
 # Obtener o crear el perfil de usuario para el administrador
 lavadero = Lavadero.objects.get(nit='900123456')
@@ -63,7 +67,17 @@ if not PerfilUsuario.objects.filter(usuario=admin_user).exists():
     )
     print(f"✓ Perfil de usuario para '{admin_user.username}' creado")
 
-# 
+# Obtener o crear el perfil de usuario para el superusuario
+admin_user = User.objects.get(username=admin_username)
+if not PerfilUsuario.objects.filter(usuario=admin_user).exists():
+    PerfilUsuario.objects.create(
+        usuario=admin_user,
+        lavadero=lavadero,
+        rol='operador'
+    )
+    print(f"✓ Perfil de usuario para '{admin_user.username}' creado")   
+
+# Obtener o crear el perfil de usuario para el operador
 operador_user = User.objects.get(username="emotorsoperador")
 if not PerfilUsuario.objects.filter(usuario=operador_user).exists():
     PerfilUsuario.objects.create(
@@ -72,8 +86,6 @@ if not PerfilUsuario.objects.filter(usuario=operador_user).exists():
         rol='operador'
     )
     print(f"✓ Perfil de usuario para '{operador_user.username}' creado")   
-
-
 
 
 servicios_data = [
@@ -122,10 +134,13 @@ ladadero = Lavadero.objects.get(nit='900123456')
 for data in servicios_data:
     Servicio.objects.update_or_create(
         nombre=data['nombre'],
-        precio=data['precio'],
         categoria=data['categoria'],
-        activo=True,
-        lavadero=lavadero
+        lavadero=lavadero,
+        # Actualizar/crear con estos valores
+        defaults={
+            'precio': data['precio'],
+            'activo': True
+        }
     )
 
 

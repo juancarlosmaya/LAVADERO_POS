@@ -14,7 +14,7 @@ class Lavadero(models.Model):
 
 # Extender usuario con relación al lavadero
 class PerfilUsuario(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil_usuarios')
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='usuarios')
     rol = models.CharField(max_length=50, choices=[('admin', 'Administrador'), ('operador', 'Operador')])
     def __str__(self):

@@ -32,7 +32,7 @@
       <a href="?periodo=semana" class="btn btn-sm {% if periodo == 'semana' %}btn-primary{% else %}btn-outline-primary{% endif %}">
         <i class="bx bx-calendar-week me-1"></i> Esta Semana
       </a>
-      {% if nombre_grupo_usuario != "administrador" %}
+      {% if nombre_grupo_usuario == "administrador" %}
       <a href="?periodo=mes" class="btn btn-sm {% if periodo == 'mes' %}btn-primary{% else %}btn-outline-primary{% endif %}">
         <i class="bx bx-calendar-month me-1"></i> Este Mes
       </a>

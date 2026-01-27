@@ -9,18 +9,24 @@ def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
     grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
-    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else None  # Extrae el nombre
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
     
-    lavadero = Lavadero.objects.first()
-    return render(request, 'Cliente/dashboard.html', {'lavadero': lavadero, 'nombre_grupo_usuario': nombre_grupo_usuario})
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    print("Lavadero dash de la sesión:", lavadero_sesion)
+    return render(request, 'Cliente/dashboard.html', {'lavadero': lavadero_sesion, 'nombre_grupo_usuario': nombre_grupo_usuario})
 
 def vista_test_bluetooth(request):
     return render(request, 'Cliente/impresion_test_ble.html')
 
 def crear_orden(request):
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    print("Lavadero de la sesión:", lavadero_sesion)
     if not request.user.is_authenticated:
         return redirect('login')
     
+    grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
+
     if request.method == 'POST':
         vehiculo_form = VehiculoForm(request.POST)
         cliente_form = ClienteForm(request.POST)
@@ -31,26 +37,26 @@ def crear_orden(request):
             # Obtener o crear cliente
             cliente, _ = Cliente.objects.get_or_create(
                 celular=cliente_form.cleaned_data['celular'],
-                defaults={'nombre': cliente_form.cleaned_data['nombre']}
+                nombre=cliente_form.cleaned_data['nombre'].upper(),
+                fecha_registro=timezone.now(),
+                lavadero=lavadero_sesion
             )
             
             # Obtener o crear vehículo
             vehiculo, _ = Vehiculo.objects.get_or_create(
                 placa=vehiculo_form.cleaned_data['placa'].upper(),
-                defaults={
-                    'tipo': vehiculo_form.cleaned_data['tipo'],
-                    'marca': vehiculo_form.cleaned_data['marca'],
-                    'modelo': vehiculo_form.cleaned_data['modelo'],
-                    'cliente': cliente,
-                    'Lavadero': Lavadero.objects.first()
-                }
+                tipo= vehiculo_form.cleaned_data['tipo'],
+                marca= vehiculo_form.cleaned_data['marca'].upper(),
+                modelo= vehiculo_form.cleaned_data['modelo'].upper(),
+                cliente= cliente,
+                lavadero=lavadero_sesion
             )
             
             # Crear orden
             orden = orden_form.save(commit=False)
             orden.vehiculo = vehiculo
             orden.cliente = cliente
-            orden.lavadero = request.user.lavaderos
+            orden.lavadero = lavadero_sesion
             orden.save()
             
             # Agregar servicios
@@ -62,12 +68,28 @@ def crear_orden(request):
         cliente_form = ClienteForm()
         orden_form = OrdenForm()
     
-    servicios = Servicio.objects.filter(activo=True)
+    servicios_sesion = Servicio.objects.filter(lavadero = request.user.perfil_usuarios.lavadero)
+    print(request.user.perfil_usuarios.lavadero)
+    print("Servicios del lavadero en sesión:", servicios_sesion)
+
+    #Servicio.objects.get(lavadero= request.user.perfil_usuarios.lavadero.nombre)
+    #servicios = Servicio.objects.filter(activo=True)
+    
+    # Organizar servicios por categoría
+    servicios_por_categoria = {}
+    for servicio in servicios_sesion:
+        if servicio.categoria not in servicios_por_categoria:
+            servicios_por_categoria[servicio.categoria] = []
+        servicios_por_categoria[servicio.categoria].append(servicio)
+    
     return render(request, 'Cliente/nueva_orden.html', {
         'vehiculo_form': vehiculo_form,
         'cliente_form': cliente_form,
         'orden_form': orden_form,
-        'servicios': servicios
+        'servicios': servicios_sesion,
+        'servicios_por_categoria': servicios_por_categoria,
+        'lavadero': lavadero_sesion,
+        'nombre_grupo_usuario': nombre_grupo_usuario
     })
 
 def ticket_orden(request, orden_id):
@@ -79,6 +101,13 @@ def ticket_orden(request, orden_id):
 def estado_servicios(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    print("Lavadero de la sesión:", lavadero_sesion)
+    
+    grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
+    
     periodo = request.GET.get('periodo', 'dia')
     hoy = timezone.localtime(timezone.now()).date()
     
@@ -96,7 +125,7 @@ def estado_servicios(request):
         fecha_inicio = hoy
         titulo_periodo = "Día Actual"
 
-    ordenes = Orden.objects.filter(fecha_creacion__date__gte=fecha_inicio).prefetch_related('servicios', 'vehiculo', 'cliente').order_by('-fecha_creacion')
+    ordenes = lavadero_sesion.ordenes.filter(fecha_creacion__date__gte=fecha_inicio).prefetch_related('servicios', 'vehiculo', 'cliente').order_by('-fecha_creacion')
     
     total_periodo = 0
     for orden in ordenes:
@@ -109,7 +138,8 @@ def estado_servicios(request):
         'fecha': hoy,
         'titulo': titulo_periodo,
         'periodo': periodo,
-        'lavadero': Lavadero.objects.first()
+        'lavadero': lavadero_sesion,
+        'nombre_grupo_usuario': nombre_grupo_usuario
     })
 
 def login_view(request):
