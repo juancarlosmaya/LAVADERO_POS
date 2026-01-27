@@ -96,7 +96,8 @@ def ticket_orden(request, orden_id):
     if not request.user.is_authenticated:
         return redirect('login')
     orden = Orden.objects.get(id=orden_id)
-    return render(request, 'Cliente/ticket_orden.html', {'orden': orden})
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    return render(request, 'Cliente/ticket_orden.html', {'orden': orden, 'lavadero': lavadero_sesion})
 
 def estado_servicios(request):
     if not request.user.is_authenticated:

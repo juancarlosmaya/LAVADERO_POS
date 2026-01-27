@@ -7,7 +7,7 @@
 
 
     <style>
-        body {
+        .ticket-container {
             font-family: 'Courier New', Courier, monospace;
             background-color: #f4f4f4;
             padding: 20px;
@@ -19,6 +19,7 @@
             background: white;
             padding: 20px;
             border: 1px solid #ccc;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .header {
@@ -84,7 +85,8 @@
     </style>
 
 
- <div class="ticket" id="ticketContent">
+ <div class="ticket-container">
+    <div class="ticket" id="ticketContent">
         <div class="header">
             <strong>{{ lavadero.nombre|default:"" }}</strong><br>
             Autolavado Profesional<br>
@@ -117,6 +119,7 @@
             Recuerda reclamar tu vehiculo maximo 30 minutos despues de finalizado el servicio (antes de cobro de parqueadero adicional).
         </div>
     </div>
+</div>
 
     <div class="btn-group">
         <button id="btnConnect" class="btn btn-print" onclick="connectAndPrint()">🔍 1. Conectar e Imprimir</button>
