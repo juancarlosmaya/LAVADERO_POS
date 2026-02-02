@@ -70,7 +70,7 @@ def crear_orden(request):
             orden.servicios.set(servicios_ids)
             server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
             numero_telefonico ="+57"+cliente.celular
-            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha sido registrada en {lavadero_sesion.nombre}. Gracias por tu confianza."
+            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
             metadatos = model_to_dict(orden)
             print("metadatos antes de modificar:", metadatos)
             metadatos['vehiculo'] = orden.vehiculo.tipo
