@@ -1,3 +1,4 @@
+from django.forms import model_to_dict
 from django.test import Client
 from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero
 from django.shortcuts import redirect, render
@@ -40,26 +41,29 @@ def crear_orden(request):
             # Obtener o crear cliente
             cliente, _ = Cliente.objects.get_or_create(
                 celular=cliente_form.cleaned_data['celular'],
-                nombre=cliente_form.cleaned_data['nombre'].upper(),
+                nombre=(cliente_form.cleaned_data.get('nombre') or '').strip().upper(),
                 fecha_registro=timezone.now(),
                 lavadero=lavadero_sesion
             )
             
             # Obtener o crear vehículo
             vehiculo, _ = Vehiculo.objects.get_or_create(
-                placa=vehiculo_form.cleaned_data['placa'].upper(),
+                placa=(vehiculo_form.cleaned_data.get('placa') or '').strip().upper(),
                 tipo= vehiculo_form.cleaned_data['tipo'],
-                marca= vehiculo_form.cleaned_data['marca'].upper(),
-                modelo= vehiculo_form.cleaned_data['modelo'].upper(),
+                marca=(vehiculo_form.cleaned_data.get('marca') or '').strip().upper(),
+                modelo= (vehiculo_form.cleaned_data.get('modelo') or '').strip().upper(),
                 cliente= cliente,
                 lavadero=lavadero_sesion
             )
             
+            #tiempo_inicio_servicio = orden_form.cleaned_data['tiempo_inicio_servicio']
+
             # Crear orden
             orden = orden_form.save(commit=False)
             orden.vehiculo = vehiculo
             orden.cliente = cliente
             orden.lavadero = lavadero_sesion
+            #orden.tiempo_inicio_servicio = tiempo_inicio_servicio
             orden.save()
             
             # Agregar servicios
@@ -67,7 +71,15 @@ def crear_orden(request):
             server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
             numero_telefonico ="+57"+cliente.celular
             message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha sido registrada en {lavadero_sesion.nombre}. Gracias por tu confianza."
-            nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message}
+            metadatos = model_to_dict(orden)
+            print("metadatos antes de modificar:", metadatos)
+            metadatos['vehiculo'] = orden.vehiculo.tipo
+            metadatos['cliente'] = orden.cliente.nombre
+            metadatos['tiempo_inicio_servicio'] = orden.tiempo_inicio_servicio.strftime("%H:%M:%S") if orden.tiempo_inicio_servicio else ""
+            metadatos['fecha_creacion'] = orden.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S")
+            metadatos['servicios'] = [servicio.nombre for servicio in orden.servicios.all()]
+            print("metadatos después de modificar:", metadatos)
+            nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message, 'metadatos': metadatos}
             response = requests.post(server_sms, data=json.dumps(nuevo_mensaje), headers={"Content-Type": "application/json"})
             print("Respuesta del servidor SMS:", response.text)
             print("message enviado:", message )
