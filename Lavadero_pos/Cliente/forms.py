@@ -52,7 +52,7 @@ class OrdenForm(forms.ModelForm):
 class VehiculoForm(forms.ModelForm):
     class Meta:
         model = Vehiculo
-        fields = ['placa', 'tipo', 'marca', 'modelo']
+        fields = ['placa', 'tipo', 'marca'] #, 'modelo']
         widgets = {
             'placa': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
@@ -66,10 +66,10 @@ class VehiculoForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
                 'placeholder': 'Ej: Mazda'
             }),
-            'modelo': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
-                'placeholder': 'Ej: 2024'
-            }),
+            #'modelo': forms.TextInput(attrs={
+            #    'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
+            #    'placeholder': 'Ej: 2024'
+            #}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -77,7 +77,7 @@ class VehiculoForm(forms.ModelForm):
         self.fields['placa'].label = 'Placa del Vehículo'
         self.fields['tipo'].label = 'Tipo de Vehículo'
         self.fields['marca'].label = 'Marca'
-        self.fields['modelo'].label = 'Modelo'
+        #self.fields['modelo'].label = 'Modelo'
 
 
 class ClienteForm(forms.ModelForm):
