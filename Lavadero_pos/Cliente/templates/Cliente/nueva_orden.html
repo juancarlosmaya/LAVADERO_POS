@@ -157,9 +157,27 @@
                     <div class="invalid-feedback">{{ orden_form.tiempo_inicio_servicio.errors.0 }}</div>
                   {% endif %}
                 </div>
+                <div class="col-md-6">
+                  <label for="id_tiempo_adicional_servicio" class="form-label">Tiempo Adicional del Servicio (opcional)</label>
+                  <select class="form-select {% if orden_form.tiempo_adicional_servicio.errors %}is-invalid{% endif %}" 
+                    id="id_tiempo_adicional_servicio" name="tiempo_adicional_servicio">
+                    <option value="">Selecciona un tiempo...</option>
+                    {% for value, label in orden_form.tiempo_adicional_servicio.field.choices %}
+                      {% if value %}
+                        <option value="{{ value }}">{{ label }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                  <small class="form-text text-muted">Selecciona para filtrar tiempos adicionales disponibles</small>
+                  {% if orden_form.tiempo_adicional_servicio.errors %}
+                    <div class="invalid-feedback">{{ orden_form.tiempo_adicional_servicio.errors.0 }}</div>
+                  {% endif %}
+                </div>
               </div>
             </div>
           </div>
+
+          
 
           <!-- SECCIÓN 5: OBSERVACIONES -->
           <div class="card mb-4">

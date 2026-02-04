@@ -72,6 +72,13 @@ class Orden(models.Model):
         ('TERMINADO', 'Terminado'),
         ('ENTREGADO', 'Entregado'),
     ]
+    TIEMPO_ADICIONAL_CHOICES = [
+        (0 , '0 Minutos'),
+        (15, '15 Minutos'),
+        (30, '30 Minutos'),
+        (45, '45 Minutos'),
+        (60, '1 Hora'),
+    ]
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.PROTECT, related_name='ordenes')
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordenes')
     servicios = models.ManyToManyField(Servicio, related_name='ordenes')
@@ -79,6 +86,7 @@ class Orden(models.Model):
     fecha_creacion = models.DateTimeField(default=timezone.now)
     observaciones = models.TextField(blank=True, null=True)
     tiempo_inicio_servicio = models.TimeField(null=True)
+    tiempo_adicional_servicio = models.IntegerField(choices=TIEMPO_ADICIONAL_CHOICES, default=0, blank=True, null=True )
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='ordenes')
 
     def __str__(self):
