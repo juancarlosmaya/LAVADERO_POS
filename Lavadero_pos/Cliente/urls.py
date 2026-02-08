@@ -9,4 +9,5 @@ urlpatterns = [
     path('nueva-orden/', views.crear_orden, name='nueva_orden'),
     path('ticket/<int:orden_id>/', views.ticket_orden, name='ticket_orden'),
     path('estado-servicios/', views.estado_servicios, name='estado_servicios'),
+    path('eliminar-orden/<int:orden_id>/', views.eliminar_orden, name='eliminar_orden'),
 ]

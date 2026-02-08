@@ -96,7 +96,11 @@
                 <th>Estado</th>
                 <th>Fecha</th>
                 <th>Servicios</th>
+                <th>Operario</th>
                 <th>Total</th>
+                {% if nombre_grupo_usuario == "administrador" %}
+                  <th>Acciones</th>
+                {% endif %}
               </tr>
             </thead>
             <tbody class="table-border-bottom-0">
@@ -132,9 +136,17 @@
                     {% endfor %}
                   </small>
                 </td>
+                <td><span class="text-uppercase fw-bold">{{ orden.operario_lavado.nombre_operario }}</span></td>
                 <td>
                   <strong class="text-success">${{ orden.total_calculado|floatformat:0 }}</strong>
                 </td>
+                {% if nombre_grupo_usuario == "administrador" %}
+                  <td class="text-center">
+                    <a href="{% url 'eliminar_orden' orden.id %}" title="Eliminar" aria-label="Eliminar orden" class="text-danger">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </a>
+                  </td>
+                {% endif %}
               </tr>
               {% endfor %}
             </tbody>

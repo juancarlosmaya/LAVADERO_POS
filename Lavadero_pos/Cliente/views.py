@@ -81,7 +81,13 @@ def crear_orden(request):
             orden.servicios.set(servicios_ids)
             server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
             numero_telefonico ="+57"+cliente.celular
-            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
+            message = f"Hola {cliente.nombre}, tu orden #{orden.id} ha sido creada exitosamente. Gracias por elegirnos. {lavadero_sesion.nombre}."
+            nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message}
+            response = requests.post(server_sms, data=json.dumps(nuevo_mensaje), headers={"Content-Type": "application/json"})
+            print("Respuesta del servidor SMS:", response.text)
+            print("message enviado:", message )
+            print("Número telefónico:", numero_telefonico )
+            
             metadatos = model_to_dict(orden)
             #print("metadatos antes de modificar:", metadatos)
             metadatos['vehiculo'] = orden.vehiculo.tipo
@@ -90,6 +96,7 @@ def crear_orden(request):
             metadatos['fecha_creacion'] = orden.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S")
             metadatos['servicios'] = [servicio.nombre for servicio in orden.servicios.all()]
             print("metadatos después de modificar:", metadatos)
+            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
             nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message, 'metadatos': metadatos}
             response = requests.post(server_sms, data=json.dumps(nuevo_mensaje), headers={"Content-Type": "application/json"})
             print("Respuesta del servidor SMS:", response.text)
@@ -199,6 +206,27 @@ def login_view(request):
     else:
         formulario = loginFormulario()
     return render(request, 'Cliente/login.html', {'formulario': formulario})
+
+def eliminar_orden(request, orden_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    print("Lavadero de la sesión:", lavadero_sesion)
+    
+    grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
+    
+    if nombre_grupo_usuario != "administrador":
+        return redirect('estado_servicios')
+    
+    try:
+        orden = Orden.objects.get(id=orden_id, lavadero=lavadero_sesion)
+        orden.delete()
+    except Orden.DoesNotExist:
+        pass
+    
+    return redirect('estado_servicios')
 
 def logout_view(request):
     logout(request)
