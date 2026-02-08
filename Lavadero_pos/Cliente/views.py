@@ -1,11 +1,11 @@
 from django.forms import model_to_dict
 from django.test import Client
-from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero
+from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero, Operario_lavado
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
-from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm
+from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm, OperarioLavadoForm
 import requests
 import json
 
@@ -32,12 +32,14 @@ def crear_orden(request):
     nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
 
     if request.method == 'POST':
+        print("datos recibidos en POST:", request.POST)
         vehiculo_form = VehiculoForm(request.POST)
         cliente_form = ClienteForm(request.POST)
         orden_form = OrdenForm(request.POST)
+        operario_lavado_form = OperarioLavadoForm(request.POST)
         servicios_ids = request.POST.getlist('servicios')
-        
-        if vehiculo_form.is_valid() and cliente_form.is_valid() and orden_form.is_valid() and servicios_ids:
+        if vehiculo_form.is_valid() and cliente_form.is_valid() and orden_form.is_valid() and operario_lavado_form.is_valid() and servicios_ids:
+            print("formularios validos")
             # Obtener o crear cliente
             cliente, _ = Cliente.objects.get_or_create(
                 celular=cliente_form.cleaned_data['celular'],
@@ -55,15 +57,24 @@ def crear_orden(request):
                 cliente= cliente,
                 lavadero=lavadero_sesion
             )
-            
-            #tiempo_inicio_servicio = orden_form.cleaned_data['tiempo_inicio_servicio']
+            # Obtener o crear operario de lavado (similar a Vehiculo)
+            operario_nombre = (operario_lavado_form.cleaned_data.get('nombre_operario') or '').strip()
+            operario, _ = Operario_lavado.objects.get_or_create(
+                nombre_operario=operario_nombre,
+                lavadero_operario=lavadero_sesion,
+                defaults={
+                    'celular_operario': '',
+                    'correo_operario': None,
+                }
+            )
+            print("EL NOMBRE DEL OPERARIO ES:", operario.nombre_operario)
 
             # Crear orden
             orden = orden_form.save(commit=False)
             orden.vehiculo = vehiculo
             orden.cliente = cliente
             orden.lavadero = lavadero_sesion
-            #orden.tiempo_inicio_servicio = tiempo_inicio_servicio
+            orden.operario_lavado = operario
             orden.save()
             
             # Agregar servicios
@@ -72,7 +83,7 @@ def crear_orden(request):
             numero_telefonico ="+57"+cliente.celular
             message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
             metadatos = model_to_dict(orden)
-            print("metadatos antes de modificar:", metadatos)
+            #print("metadatos antes de modificar:", metadatos)
             metadatos['vehiculo'] = orden.vehiculo.tipo
             metadatos['cliente'] = orden.cliente.nombre
             metadatos['tiempo_inicio_servicio'] = orden.tiempo_inicio_servicio.strftime("%H:%M:%S") if orden.tiempo_inicio_servicio else ""
@@ -89,10 +100,11 @@ def crear_orden(request):
         vehiculo_form = VehiculoForm()
         cliente_form = ClienteForm()
         orden_form = OrdenForm()
+        operario_lavado_form = OperarioLavadoForm()
     
     servicios_sesion = Servicio.objects.filter(lavadero = request.user.perfil_usuarios.lavadero)
-    print(request.user.perfil_usuarios.lavadero)
-    print("Servicios del lavadero en sesión:", servicios_sesion)
+    #print(request.user.perfil_usuarios.lavadero)
+    #print("Servicios del lavadero en sesión:", servicios_sesion)
 
     #Servicio.objects.get(lavadero= request.user.perfil_usuarios.lavadero.nombre)
     #servicios = Servicio.objects.filter(activo=True)
@@ -103,6 +115,8 @@ def crear_orden(request):
         if servicio.categoria not in servicios_por_categoria:
             servicios_por_categoria[servicio.categoria] = []
         servicios_por_categoria[servicio.categoria].append(servicio)
+
+    operarios_sesion = Operario_lavado.objects.filter(lavadero_operario = request.user.perfil_usuarios.lavadero)
     
     return render(request, 'Cliente/nueva_orden.html', {
         'vehiculo_form': vehiculo_form,
@@ -111,7 +125,9 @@ def crear_orden(request):
         'servicios': servicios_sesion,
         'servicios_por_categoria': servicios_por_categoria,
         'lavadero': lavadero_sesion,
-        'nombre_grupo_usuario': nombre_grupo_usuario
+        'nombre_grupo_usuario': nombre_grupo_usuario,
+        'operario_lavado_form': operario_lavado_form,
+        'operarios': operarios_sesion    
     })
 
 def ticket_orden(request, orden_id):

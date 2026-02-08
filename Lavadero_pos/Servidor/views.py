@@ -2,14 +2,15 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero
+from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero, Operario_lavado
 from .serializers import (
     ClienteSerializer, 
     VehiculoSerializer, 
     ServicioSerializer, 
     OrdenSerializer, 
     PagoSerializer,
-    LavaderoSerializer
+    LavaderoSerializer,
+    Operario_lavadoSerializer
 )
 
 class LavaderoViewSet(viewsets.ModelViewSet):
@@ -103,6 +104,10 @@ class OrdenViewSet(viewsets.ModelViewSet):
 class PagoViewSet(viewsets.ModelViewSet):
     queryset = Pago.objects.all()
     serializer_class = PagoSerializer
+
+class Operario_lavadoViewSet(viewsets.ModelViewSet):
+    queryset = Operario_lavado.objects.all()
+    serializer_class = Operario_lavadoSerializer
 
 def vista_test_bluetooth(request):
     return render(request, 'aplicacion_pos/impresion_test_ble.html')

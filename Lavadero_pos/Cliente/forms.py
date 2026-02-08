@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from Servidor.models import Orden, Vehiculo, Cliente
+from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado
 
 
 class loginFormulario(forms.Form):
@@ -102,3 +102,22 @@ class ClienteForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['nombre'].label = 'Nombre Completo'
         self.fields['celular'].label = 'Número de Celular'
+
+class OperarioLavadoForm(forms.ModelForm):
+    class Meta:
+        model = Operario_lavado
+        fields = ['nombre_operario','celular_operario','correo_operario']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
+                'placeholder': 'Nombre del operario'
+            }),
+            'celular': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
+                'placeholder': '3001234567'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
+                'placeholder': 'correo@lavadero.com'
+            }),
+        }   

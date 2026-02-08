@@ -65,6 +65,17 @@ class Servicio(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.get_categoria_display()}) - ${self.precio}"
 
+class Operario_lavado(models.Model):
+    nombre_operario = models.CharField(max_length=100, blank=True, null=True)
+    celular_operario = models.CharField(max_length=15, blank=True)
+    correo_operario = models.EmailField(blank=True, null=True)
+    lavadero_operario = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='operarios_lavado')
+
+    def __str__(self):
+        return f"{self.nombre_operario} - Operario en {self.lavadero_operario.nombre}"
+
+
+
 class Orden(models.Model):
     ESTADO_CHOICES = [
         ('EN_COLA', 'En Cola'),
@@ -88,7 +99,7 @@ class Orden(models.Model):
     tiempo_inicio_servicio = models.TimeField(null=True)
     tiempo_adicional_servicio = models.IntegerField(choices=TIEMPO_ADICIONAL_CHOICES, default=0, blank=True, null=True )
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='ordenes')
-
+    operario_lavado = models.ForeignKey(Operario_lavado, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordenes')
     def __str__(self):
         return f"Orden #{self.id} - {self.vehiculo.placa}"
 

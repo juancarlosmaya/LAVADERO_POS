@@ -173,6 +173,20 @@
                     <div class="invalid-feedback">{{ orden_form.tiempo_adicional_servicio.errors.0 }}</div>
                   {% endif %}
                 </div>
+                <div class="col-md-6">
+                  <label for="id_operario_lavado" class="form-label">Operario Servicio:</label>
+                  <select class="form-select {% if operario_lavado_form.errors %}is-invalid{% endif %}" 
+                    id="id_operario_lavado" name="nombre_operario">
+                    <option value="">Selecciona un Operario...</option>
+                    {% for operario in operarios %}
+                      <option value="{{ operario.nombre_operario }}">{{ operario.nombre_operario }}</option>
+                    {% endfor %}
+                  </select>
+                  <small class="form-text text-muted">Selecciona un operario de lavado</small>
+                  {% if operario_lavado_form.errors %}
+                    <div class="invalid-feedback">{{ operario_lavado_form.errors.0 }}</div>
+                  {% endif %}
+                </div>
               </div>
             </div>
           </div>
