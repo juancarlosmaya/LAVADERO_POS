@@ -223,6 +223,23 @@ def eliminar_orden(request, orden_id):
     try:
         orden = Orden.objects.get(id=orden_id, lavadero=lavadero_sesion)
         orden.delete()
+        ## enviar mensaje enviado previamente a mensajeremota y en eliminarlo de la base de datos de mensajeremota para evitar que se envie el mensaje al cliente después de eliminar la orden
+        server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
+        
+        # Obtener todos los mensajes de la API
+        response_get = requests.get(server_sms)
+        if response_get.status_code == 200:
+            print("Respuesta del servidor SMS al obtener mensajes:", response_get.text)
+            mensajes = response_get.json()
+            # Buscar el mensaje donde metadatos.id == orden_id
+            for mensaje in mensajes:
+                if mensaje.get('metadatos') and mensaje['metadatos'].get('id') == orden_id:
+                    mensaje_id = mensaje['id']
+                    # Actualizar el estado del mensaje
+                    print(f"Mensaje encontrado para orden {orden_id}, eliminando mensaje con ID {mensaje_id}")
+                    print(f"URL para eliminar mensaje: {server_sms}{mensaje_id}/")
+                    requests.delete(f'{server_sms}{mensaje_id}/')
+                    break
     except Orden.DoesNotExist:
         pass
     
