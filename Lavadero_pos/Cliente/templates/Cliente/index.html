@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAVADERO POS - Sistema de Gestión para Lavaderos de Autos</title>
+  <meta name="description"
+    content="Software profesional para la gestión integral de tu lavadero de autos. Órdenes, pagos, SMS y más.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #06b6d4;
+      --dark: #0f172a;
+      --dark2: #1e293b;
+      --gray: #64748b;
+      --light: #f8fafc;
+      --gradient: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+      --glass: rgba(255, 255, 255, 0.08);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+
+    /* NAVBAR */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      background: rgba(15, 23, 42, .7);
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      margin-left: 2rem;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: .3s;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .btn-cta {
+      background: var(--gradient);
+      color: white !important;
+      padding: .6rem 1.5rem;
+      border-radius: 50px;
+      -webkit-text-fill-color: white !important;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(37, 99, 235, .15) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(6, 182, 212, .1) 0%, transparent 70%);
+      bottom: 0;
+      left: -50px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, .1);
+      padding: .4rem 1.2rem;
+      border-radius: 50px;
+      font-size: .8rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 .highlight {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary-hero {
+      background: var(--gradient);
+      color: white;
+      padding: .9rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: .3s;
+      box-shadow: 0 4px 30px rgba(37, 99, 235, .3);
+    }
+
+    .btn-primary-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(37, 99, 235, .4);
+    }
+
+    .btn-secondary-hero {
+      background: var(--glass);
+      color: white;
+      padding: .9rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1rem;
+      border: 1px solid rgba(255, 255, 255, .1);
+      transition: .3s;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: .85rem;
+      color: #64748b;
+      margin-top: .2rem;
+    }
+
+    /* SECTION STYLES */
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .section-title p {
+      color: #94a3b8;
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+
+    /* FEATURES */
+    .features-bg {
+      background: var(--dark2);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: var(--dark);
+      border: 1px solid rgba(255, 255, 255, .05);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: .3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(37, 99, 235, .3);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 1.2rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .feature-card p {
+      font-size: .9rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* VEHICLES */
+    .vehicles-row {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .vehicle-chip {
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, .1);
+      padding: 1rem 2rem;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: .3s;
+      cursor: default;
+    }
+
+    .vehicle-chip:hover {
+      background: rgba(37, 99, 235, .15);
+      border-color: rgba(37, 99, 235, .3);
+    }
+
+    .vehicle-chip i {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+      display: flex;
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .step {
+      flex: 1;
+      min-width: 220px;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .step p {
+      font-size: .85rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* PRICING */
+    .pricing-card {
+      max-width: 500px;
+      margin: 0 auto;
+      background: linear-gradient(145deg, var(--dark2), var(--dark));
+      border: 2px solid rgba(37, 99, 235, .3);
+      border-radius: 24px;
+      padding: 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient);
+    }
+
+    .price {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 1rem 0;
+    }
+
+    .price-period {
+      font-size: 1rem;
+      color: #64748b;
+      -webkit-text-fill-color: #64748b;
+    }
+
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin: 2rem 0;
+    }
+
+    .pricing-features li {
+      padding: .6rem 0;
+      color: #cbd5e1;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .pricing-features li i {
+      color: #22c55e;
+      font-size: 1.1rem;
+    }
+
+    .btn-pricing {
+      display: inline-block;
+      background: var(--gradient);
+      color: white;
+      padding: 1rem 3rem;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: .3s;
+    }
+
+    /* CTA */
+    .cta-section {
+      background: var(--gradient);
+      text-align: center;
+      border-radius: 24px;
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+      padding: 4rem 2rem;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      color: rgba(255, 255, 255, .8);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-cta-white {
+      background: white;
+      color: var(--primary);
+      padding: 1rem 3rem;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: .3s;
+      display: inline-block;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 3rem 2rem;
+      text-align: center;
+      color: #475569;
+      font-size: .85rem;
+      border-top: 1px solid rgba(255, 255, 255, .05);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ANIMATIONS */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media(max-width:768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .stats {
+        gap: 1.5rem;
+      }
+
+      .stat-num {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">💧 LAVADERO POS</div>
+    <div class="nav-links">
+      <a href="#features">Funcionalidades</a>
+      <a href="#como-funciona">Cómo Funciona</a>
+      <a href="#precios">Precios</a>
+      <a href="#precios">Solicitar Demo</a>
+      <a href="login" class="btn-cta">Iniciar Sesión</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content fade-in">
+      <span class="hero-badge">🚀 Software #1 para Lavaderos en Colombia</span>
+      <h1>Gestiona tu lavadero <span class="highlight">desde tu celular</span></h1>
+      <p>Sistema POS completo para lavaderos de autos, motos y bicicletas. Controla órdenes, pagos, operarios y envía
+        SMS automáticos a tus clientes.</p>
+      <div class="hero-buttons">
+        <a href="https://wa.me/573197918173?text=Hola%2C%20quiero%20información%20sobre%20LAVADERO%20POS"
+          class="btn-primary-hero"><i class="fab fa-whatsapp"></i> &nbsp;Solicitar Demo Gratis</a>
+        <a href="#features" class="btn-secondary-hero">Ver funcionalidades →</a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Tipos de Vehículos</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">4</div>
+          <div class="stat-label">Métodos de Pago</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">Acceso en la Nube</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">SMS</div>
+          <div class="stat-label">Notificaciones Auto.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="features-bg">
+    <div class="section-title fade-in">
+      <h2>Todo lo que necesitas para tu lavadero</h2>
+      <p>Un sistema completo que digitaliza y automatiza cada aspecto de tu negocio</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-file-invoice"></i></div>
+        <h3>Gestión de Órdenes</h3>
+        <p>Crea, gestiona y da seguimiento a cada orden de lavado. Asigna vehículos, clientes y operarios en segundos.
+        </p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-money-bill-wave"></i></div>
+        <h3>Múltiples Métodos de Pago</h3>
+        <p>Acepta Efectivo, Nequi, DaviPlata y Tarjeta. Control total de ingresos con reportes por periodo.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-sms"></i></div>
+        <h3>SMS Automáticos</h3>
+        <p>Tus clientes reciben un mensaje cuando su orden es creada y otro cuando su vehículo está listo. ¡Sin
+          esfuerzo!</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-print"></i></div>
+        <h3>Impresión Bluetooth</h3>
+        <p>Imprime tickets de orden directamente desde tu celular a una impresora térmica por Bluetooth.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Reportes de Ventas</h3>
+        <p>Consulta las ventas del día, semana, mes o año. Conoce cuánto factura tu lavadero en tiempo real.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
+        <h3>Roles y Permisos</h3>
+        <p>Cuentas separadas para administradores y operadores. Cada quien ve solo lo que necesita.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+        <h3>100% en la Nube</h3>
+        <p>Accede desde cualquier dispositivo con internet. Sin instalaciones, sin servidores, sin complicaciones.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-tags"></i></div>
+        <h3>Servicios Personalizables</h3>
+        <p>Configura tus propios servicios, precios y categorías. Adapta el sistema a tu lavadero, no al revés.</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon"><i class="fas fa-user-tie"></i></div>
+        <h3>Gestión de Operarios</h3>
+        <p>Registra tus operarios y asigna cada lavado. Lleva el control de quién hizo qué servicio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VEHICLES -->
+  <section>
+    <div class="section-title fade-in">
+      <h2>Para todo tipo de vehículos</h2>
+      <p>Desde bicicletas hasta camionetas, configura servicios para cada categoría</p>
+    </div>
+    <div class="vehicles-row fade-in">
+      <div class="vehicle-chip"><i class="fas fa-car"></i> Automóviles</div>
+      <div class="vehicle-chip"><i class="fas fa-truck-pickup"></i> Camionetas 5 Pas.</div>
+      <div class="vehicle-chip"><i class="fas fa-shuttle-van"></i> Camionetas 7 Pas.</div>
+      <div class="vehicle-chip"><i class="fas fa-motorcycle"></i> Motos</div>
+      <div class="vehicle-chip"><i class="fas fa-bicycle"></i> Bicicletas</div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="como-funciona" class="features-bg">
+    <div class="section-title fade-in">
+      <h2>¿Cómo funciona?</h2>
+      <p>En 3 simples pasos, tu lavadero estará digitalizado</p>
+    </div>
+    <div class="steps fade-in">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Registra tu lavadero</h3>
+        <p>Configura tus servicios, precios, operarios y métodos de pago en minutos</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Crea órdenes</h3>
+        <p>Ingresa vehículo, cliente y servicios. El sistema envía un SMS automático al cliente</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Cobra y reporta</h3>
+        <p>Registra el pago, imprime el ticket, y consulta reportes de ventas al instante</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="precios">
+    <div class="section-title fade-in">
+      <h2>Inversión que se paga sola</h2>
+      <p>Un solo plan con todo incluido, sin letra pequeña</p>
+    </div>
+    <div class="pricing-card fade-in">
+      <h3 style="color:var(--accent);font-size:1rem;text-transform:uppercase;letter-spacing:2px;">Plan Profesional</h3>
+      <div class="price">$50.000<span class="price-period"> / mes</span></div>
+      <ul class="pricing-features">
+        <li><i class="fas fa-check-circle"></i> Órdenes ilimitadas</li>
+        <li><i class="fas fa-check-circle"></i> SMS automáticos a clientes</li>
+        <li><i class="fas fa-check-circle"></i> Múltiples métodos de pago</li>
+        <li><i class="fas fa-check-circle"></i> Impresión Bluetooth de tickets</li>
+        <li><i class="fas fa-check-circle"></i> Reportes de ventas (día/semana/mes/año)</li>
+        <li><i class="fas fa-check-circle"></i> Usuarios administrador + operadores</li>
+        <li><i class="fas fa-check-circle"></i> Acceso 24/7 desde cualquier dispositivo</li>
+        <li><i class="fas fa-check-circle"></i> Soporte técnico incluido</li>
+      </ul>
+      <a href="https://wa.me/573197918173?text=Hola%2C%20quiero%20contratar%20LAVADERO%20POS" class="btn-pricing"><i
+          class="fab fa-whatsapp"></i> &nbsp;Solicitar Ahora</a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contacto">
+    <div class="cta-section fade-in">
+      <h2>¿Listo para digitalizar tu lavadero?</h2>
+      <p>Solicita una demostración gratuita y descubre cómo LAVADERO POS transforma tu negocio</p>
+      <a href="https://wa.me/573197918173?text=Hola%2C%20quiero%20una%20demo%20gratuita%20de%20LAVADERO%20POS"
+        class="btn-cta-white"><i class="fab fa-whatsapp"></i> &nbsp;Escribir por WhatsApp</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 LAVADERO POS — Sistema de Gestión para Lavaderos de Vehículos<br>
+      <a href="https://wa.me/573197918173">Contacto WhatsApp</a>
+    </p>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+  </script>
+</body>
+
+</html>

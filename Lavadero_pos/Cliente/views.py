@@ -248,3 +248,7 @@ def eliminar_orden(request, orden_id):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+def home(request):
+    print("Bienvenido HOME")
+    return render(request, 'Cliente/index.html')
