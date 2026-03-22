@@ -9,6 +9,10 @@ from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm, Operar
 import requests
 import json
 
+def home(request):
+    print("Bienvenido HOME")
+    return render(request, 'Cliente/index.html')
+    
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -248,7 +252,3 @@ def eliminar_orden(request, orden_id):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-def home(request):
-    print("Bienvenido HOME")
-    return render(request, 'Cliente/index.html')
