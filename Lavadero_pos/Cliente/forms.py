@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado
+from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado, Categoria
 
 
 class loginFormulario(forms.Form):
@@ -76,10 +76,14 @@ class VehiculoForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        lavadero = kwargs.pop('lavadero', None)  # Extraer lavadero antes de pasar a super()
         super().__init__(*args, **kwargs)
         self.fields['placa'].label = 'Placa del Vehículo'
         self.fields['tipo'].label = 'Tipo de Vehículo'
         self.fields['marca'].label = 'Marca'
+        ## INICIALIZA EL FORMULARIO CON LOS DATOS DE LOS VEHICULOS DEL LAVADERO
+        if lavadero:
+            self.fields['tipo'].queryset = Categoria.objects.filter(lavadero=lavadero, activo=True)
         #self.fields['modelo'].label = 'Modelo'
 
 

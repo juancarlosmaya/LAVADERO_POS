@@ -7,6 +7,7 @@ from .views import (
     OrdenViewSet, 
     PagoViewSet,
     LavaderoViewSet,
+    CategoriaViewSet,
     Operario_lavadoViewSet,
     vista_test_bluetooth
 )
@@ -18,7 +19,8 @@ router.register(r'servicios', ServicioViewSet)
 router.register(r'ordenes', OrdenViewSet)
 router.register(r'pagos', PagoViewSet)
 router.register(r'lavaderos', LavaderoViewSet)
-router.register(r'operarios-lavado', Operario_lavadoViewSet)    
+router.register(r'operarios-lavado', Operario_lavadoViewSet)
+router.register(r'categorias', CategoriaViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

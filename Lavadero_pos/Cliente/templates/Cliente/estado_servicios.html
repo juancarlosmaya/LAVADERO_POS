@@ -109,7 +109,7 @@
                 <td>
                   <span class="badge bg-primary">#{{ orden.id }}</span>
                 </td>
-                <td class="fw-bold">{{ orden.vehiculo.get_tipo_display }}</td>
+                <td class="fw-bold">{{ orden.vehiculo.tipo.tipo_vehiculo }}</td>
                 <td><span class="text-uppercase fw-bold">{{ orden.vehiculo.placa }}</span></td>
                 <td>
                   {% if orden.estado == 'completada' %}

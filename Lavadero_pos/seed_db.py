@@ -6,8 +6,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Lavadero_pos.settings')
 django.setup()
 
-from Servidor.models import Servicio, Lavadero, PerfilUsuario
-from django.contrib.auth.models import User
+from Servidor.models import Servicio, Categoria, Lavadero, PerfilUsuario
+from django.contrib.auth.models import User, Group
 
 # Crear usuario superusuario
 admin_username = "juanc"
@@ -25,9 +25,19 @@ first_name = "Jesus"
 last_name = "Duarte"
 #email = "admin@demo.com"
 
+# Crear grupo administrador
+nombre_grupo_usuario = "administrador" 
+if not Group.objects.filter(name=nombre_grupo_usuario).exists():
+    Group.objects.create(name=nombre_grupo_usuario)
+    print(f"✓ Grupo '{nombre_grupo_usuario}' creado")
+else:
+    print(f"✓ Grupo '{nombre_grupo_usuario}' ya existe")
+
 if not User.objects.filter(username=username).exists():
-    User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
+    usuario = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
     print(f"✓ Usuario administrador '{username}' creado con contraseña '{password}'")
+    usuario.groups.add(Group.objects.get(name="administrador"))
+    print(f"✓ Usuario administrador '{username}' agregado al grupo '{nombre_grupo_usuario}'")
 else:
     print(f"✓ Usuario administrador '{username}' ya existe")
 
@@ -87,49 +97,72 @@ if not PerfilUsuario.objects.filter(usuario=operador_user).exists():
     )
     print(f"✓ Perfil de usuario para '{operador_user.username}' creado")   
 
+categorias_data = [
+    {"clave_vehiculo": "CARRO", "tipo_vehiculo": "Automóvil", "activo": True},
+    {"clave_vehiculo": "MOTO", "tipo_vehiculo": "Motocicleta", "activo": True},
+    {"clave_vehiculo": "CAMIONETA_5", "tipo_vehiculo": "Camioneta (5 Pasajeros)", "activo": True},
+    {"clave_vehiculo": "CAMIONETA_7", "tipo_vehiculo": "Camioneta (7 Pasajeros)", "activo": True},
+    {"clave_vehiculo": "BICICLETA", "tipo_vehiculo": "Bicicleta", "activo": True},
+    {"clave_vehiculo": "OTROS", "tipo_vehiculo": "Otros", "activo": True},
+]
+
+print(f"Cargando categotias actualizados...")
+for data in categorias_data:
+    Categoria.objects.update_or_create(
+        clave_vehiculo=data['clave_vehiculo'],
+        tipo_vehiculo=data['tipo_vehiculo'],
+        lavadero=lavadero,
+        # Actualizar/crear con estos valores
+        defaults={
+            'activo': data['activo']
+        }
+    )   
 
 servicios_data = [
     # AUTOMÓVILES (CARRO)
-    {"nombre": "LAVADO EXTERIOR", "precio": "16000.00", "categoria": "CARRO"},
-    {"nombre": "TAPIZADA", "precio": "16000.00", "categoria": "CARRO"},
-    {"nombre": "LAVADA + TAPIZADA", "precio": "21000.00", "categoria": "CARRO"},
-    {"nombre": "LAVADA + TAPIZADA + CHASIS", "precio": "46000.00", "categoria": "CARRO"},
-    {"nombre": "POLICHADA", "precio": "87000.00", "categoria": "CARRO"},
-    {"nombre": "LAVADO DE COJINERIA E INTERIOR A VAPOR", "precio": "158000.00", "categoria": "CARRO"},
-    {"nombre": "LAVADO PREMIUM", "precio": "0.00", "categoria": "CARRO", "activo": False}, # Sin precio visible/activo
+    {"nombre": "LAVADO EXTERIOR", "precio": "16000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "TAPIZADA", "precio": "16000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "LAVADA + TAPIZADA", "precio": "21000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "LAVADA + TAPIZADA + CHASIS", "precio": "46000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "POLICHADA", "precio": "87000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "LAVADO DE COJINERIA E INTERIOR A VAPOR", "precio": "158000.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO")},
+    {"nombre": "LAVADO PREMIUM", "precio": "0.00", "categoria": Categoria.objects.get(clave_vehiculo="CARRO"), "activo": False}, # Sin precio visible/activo
 
     # CAMIONETAS 5 PASAJEROS 
-    {"nombre": "Lavado Exterior", "precio": "18000.00", "categoria": "CAMIONETA_5"},
-    {"nombre": "Lavada + Tapizada", "precio": "30000.00", "categoria": "CAMIONETA_5"},
-    {"nombre": "Lavada + Tapizada + Chasis", "precio": "55000.00", "categoria": "CAMIONETA_5"},
-    {"nombre": "Polichada", "precio": "110000.00", "categoria": "CAMIONETA_5"},
-    {"nombre": "Lavado de Cojinería e Interior a Vapor", "precio": "182000.00", "categoria": "CAMIONETA_5"},
+    {"nombre": "Lavado Exterior", "precio": "18000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_5")},
+    {"nombre": "Lavada + Tapizada", "precio": "30000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_5")},
+    {"nombre": "Lavada + Tapizada + Chasis", "precio": "55000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_5")},
+    {"nombre": "Polichada", "precio": "110000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_5")},
+    {"nombre": "Lavado de Cojinería e Interior a Vapor", "precio": "182000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_5")},
 
     # CAMIONETAS 7 PASAJEROS
-    {"nombre": "Lavado Exterior", "precio": "21000.00", "categoria": "CAMIONETA_7"},
-    {"nombre": "Tapizada", "precio": "20000.00", "categoria": "CAMIONETA_7"},
-    {"nombre": "Lavada + Tapizada", "precio": "32000.00", "categoria": "CAMIONETA_7"},
-    {"nombre": "Lavada + Tapizada + Chasis", "precio": "52000.00", "categoria": "CAMIONETA_7"},
-    {"nombre": "Polichada", "precio": "115000.00", "categoria": "CAMIONETA_7"},
-    {"nombre": "Lavado de Cojinería e Interior a Vapor", "precio": "196000.00", "categoria": "CAMIONETA_7"},
+    {"nombre": "Lavado Exterior", "precio": "21000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
+    {"nombre": "Tapizada", "precio": "20000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
+    {"nombre": "Lavada + Tapizada", "precio": "32000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
+    {"nombre": "Lavada + Tapizada + Chasis", "precio": "52000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
+    {"nombre": "Polichada", "precio": "115000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
+    {"nombre": "Lavado de Cojinería e Interior a Vapor", "precio": "196000.00", "categoria": Categoria.objects.get(clave_vehiculo="CAMIONETA_7")},
 
     # MOTOS
-    {"nombre": "ENJUAGADA","precio": "14000.00","categoria": "MOTO"},
-    {"nombre": "ENJUAGADA + LLANTIL", "precio": "15000.00", "categoria": "MOTO"},
-    {"nombre": "ENJUAGADA + DESENGRASANTE + SILICONA + LLANTIL + ABRILLANTADOR DE MOTOR","precio": "18000.00","categoria": "MOTO"},
-    {"nombre": "LAVADO PREMIUM (LUBRICADA DE CADENA)", "precio": "21000.00", "categoria": "MOTO"},
+    {"nombre": "ENJUAGADA","precio": "14000.00","categoria": Categoria.objects.get(clave_vehiculo="MOTO")},
+    {"nombre": "ENJUAGADA + LLANTIL", "precio": "15000.00", "categoria": Categoria.objects.get(clave_vehiculo="MOTO")},
+    {"nombre": "ENJUAGADA + DESENGRASANTE + SILICONA + LLANTIL + ABRILLANTADOR DE MOTOR","precio": "18000.00","categoria": Categoria.objects.get(clave_vehiculo="MOTO")},
+    {"nombre": "LAVADO PREMIUM (LUBRICADA DE CADENA)", "precio": "21000.00", "categoria": Categoria.objects.get(clave_vehiculo="MOTO")},
     
     # BICICLETAS
-    {"nombre": "ENJUAGADA","precio": "7000.00","categoria": "BICICLETA"},
-    {"nombre": "ENJUAGADA + DESENGRASADO DE CADENA","precio": "9000.00","categoria": "BICICLETA"},
-    {"nombre": "ENJUAGADA + DESENGRASADO Y LUBRICADO DE CADENA","precio": "12000.00","categoria": "BICICLETA"}
+    {"nombre": "ENJUAGADA","precio": "7000.00","categoria": Categoria.objects.get(clave_vehiculo="BICICLETA")},
+    {"nombre": "ENJUAGADA + DESENGRASADO DE CADENA","precio": "9000.00","categoria": Categoria.objects.get(clave_vehiculo="BICICLETA")},
+    {"nombre": "ENJUAGADA + DESENGRASADO Y LUBRICADO DE CADENA","precio": "12000.00","categoria": Categoria.objects.get(clave_vehiculo="BICICLETA")},
+
+    # OTROS
+    {"nombre": "ENJUAGADA","precio": "7000.00","categoria": Categoria.objects.get(clave_vehiculo="OTROS")},
+    {"nombre": "ENJUAGADA + DESENGRASADO DE CADENA","precio": "9000.00","categoria": Categoria.objects.get(clave_vehiculo="OTROS")},
+    {"nombre": "ENJUAGADA + DESENGRASADO Y LUBRICADO DE CADENA","precio": "12000.00","categoria": Categoria.objects.get(clave_vehiculo="OTROS")}
 
 ]
 
 print(f"Cargando servicios actualizados...")
 
-
-ladadero = Lavadero.objects.get(nit='900123456')
 # Busca y actualiza los servicios existentes o crea nuevos, los busca por nombre y categoria. Si no existe lo crea. Si existe actualiza su precio y estado.
 for data in servicios_data:
     Servicio.objects.update_or_create(

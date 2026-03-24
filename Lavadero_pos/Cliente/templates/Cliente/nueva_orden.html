@@ -247,16 +247,9 @@
 {% block page_js %}
 <script src="{% static 'Cliente/js/nueva_orden.js' %}"></script>
 <script>
-// Mapeo de tipos de vehículo a categorías de servicios
-const tipoVehiculoACategoriaMap = {
-  'CARRO': 'CARRO',
-  'MOTO': 'MOTO',
-  'CAMIONETA_5': 'CAMIONETA_5',
-  'CAMIONETA_7': 'CAMIONETA_7',
-  'BICICLETA': 'BICICLETA'
-};
+// Ya no necesitamos mapeo: el valor del select de tipo de vehículo ES el ID de la categoría
 
-// Datos de servicios organizados por categoría
+// Datos de servicios organizados por categoría (ID)
 const serviciosPorCategoria = {};
 
 // Extraer datos de servicios del DOM
@@ -288,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (tipoVehiculoSelect) {
     tipoVehiculoSelect.addEventListener('change', function() {
       const tipoId = this.value;
-      console.log('Tipo seleccionado:', tipoId);
+      console.log('Tipo seleccionado (categoria ID):', tipoId);
       
       if (!tipoId) {
         servicesContainer.innerHTML = `
@@ -299,16 +292,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Obtener la categoría correspondiente al tipo de vehículo
-      const categoria = tipoVehiculoACategoriaMap[tipoId];
-      const servicios = serviciosPorCategoria[categoria] || [];
+      // El tipoId ya ES el ID de la categoría, no necesitamos mapeo
+      const servicios = serviciosPorCategoria[tipoId] || [];
       
       if (servicios.length > 0) {
         let serviciosHTML = '';
         
         servicios.forEach(servicio => {
           serviciosHTML += `
-            <div class="form-check mb-3 p-3 border rounded" data-categoria="${categoria}" data-precio="${servicio.precio}">
+            <div class="form-check mb-3 p-3 border rounded" data-categoria="${tipoId}" data-precio="${servicio.precio}">
               <input class="form-check-input service-checkbox" type="checkbox" name="servicios" value="${servicio.id}" 
                 id="servicio_${servicio.id}" data-price="${servicio.precio}">
               <label class="form-check-label w-100" for="servicio_${servicio.id}">

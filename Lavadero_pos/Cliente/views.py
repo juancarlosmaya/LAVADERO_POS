@@ -37,7 +37,7 @@ def crear_orden(request):
 
     if request.method == 'POST':
         print("datos recibidos en POST:", request.POST)
-        vehiculo_form = VehiculoForm(request.POST)
+        vehiculo_form = VehiculoForm(request.POST, lavadero=lavadero_sesion)
         cliente_form = ClienteForm(request.POST)
         orden_form = OrdenForm(request.POST)
         operario_lavado_form = OperarioLavadoForm(request.POST)
@@ -94,13 +94,13 @@ def crear_orden(request):
             
             metadatos = model_to_dict(orden)
             #print("metadatos antes de modificar:", metadatos)
-            metadatos['vehiculo'] = orden.vehiculo.tipo
+            metadatos['vehiculo'] = orden.vehiculo.tipo.tipo_vehiculo
             metadatos['cliente'] = orden.cliente.nombre
             metadatos['tiempo_inicio_servicio'] = orden.tiempo_inicio_servicio.strftime("%H:%M:%S") if orden.tiempo_inicio_servicio else ""
             metadatos['fecha_creacion'] = orden.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S")
             metadatos['servicios'] = [servicio.nombre for servicio in orden.servicios.all()]
             print("metadatos después de modificar:", metadatos)
-            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
+            message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo.tipo_vehiculo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
             nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message, 'metadatos': metadatos}
             response = requests.post(server_sms, data=json.dumps(nuevo_mensaje), headers={"Content-Type": "application/json"})
             print("Respuesta del servidor SMS:", response.text)
@@ -108,25 +108,24 @@ def crear_orden(request):
             print("Número telefónico:", numero_telefonico )
             return redirect('ticket_orden', orden_id=orden.id)
     else:
-        vehiculo_form = VehiculoForm()
+        vehiculo_form = VehiculoForm(lavadero=lavadero_sesion)  ## INICIALIZA EL FORMULARIO CON LOS DATOS DE LOS VEHICULOS DEL LAVADERO
         cliente_form = ClienteForm()
         orden_form = OrdenForm()
         operario_lavado_form = OperarioLavadoForm()
     
     servicios_sesion = Servicio.objects.filter(lavadero = request.user.perfil_usuarios.lavadero)
-    #print(request.user.perfil_usuarios.lavadero)
-    #print("Servicios del lavadero en sesión:", servicios_sesion)
-
-    #Servicio.objects.get(lavadero= request.user.perfil_usuarios.lavadero.nombre)
-    #servicios = Servicio.objects.filter(activo=True)
-    
-    # Organizar servicios por categoría
+    print(request.user.perfil_usuarios.lavadero)
+    print("Servicios del lavadero en sesión:", servicios_sesion)
+   
+    # Organizar servicios por categoría (usando el ID de categoría como clave)
     servicios_por_categoria = {}
     for servicio in servicios_sesion:
-        if servicio.categoria not in servicios_por_categoria:
-            servicios_por_categoria[servicio.categoria] = []
-        servicios_por_categoria[servicio.categoria].append(servicio)
-
+        cat_id = str(servicio.categoria_id)  # Convertir a string para que coincida con el value del select en JS
+        if cat_id not in servicios_por_categoria:
+            servicios_por_categoria[cat_id] = []
+        servicios_por_categoria[cat_id].append(servicio)
+    print("servicios_por_categoria:", servicios_por_categoria)
+    
     operarios_sesion = Operario_lavado.objects.filter(lavadero_operario = request.user.perfil_usuarios.lavadero)
     
     return render(request, 'Cliente/nueva_orden.html', {
@@ -251,4 +250,4 @@ def eliminar_orden(request, orden_id):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')

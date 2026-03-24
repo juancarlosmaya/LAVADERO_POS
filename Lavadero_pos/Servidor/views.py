@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero, Operario_lavado
+from .models import Cliente, Vehiculo, Servicio, Orden, Pago, Lavadero, Operario_lavado, Categoria
 from .serializers import (
     ClienteSerializer, 
     VehiculoSerializer, 
@@ -10,8 +10,13 @@ from .serializers import (
     OrdenSerializer, 
     PagoSerializer,
     LavaderoSerializer,
-    Operario_lavadoSerializer
+    Operario_lavadoSerializer,
+    CategoriaSerializer
 )
+
+class CategoriaViewSet(viewsets.ModelViewSet):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
 
 class LavaderoViewSet(viewsets.ModelViewSet):
     queryset = Lavadero.objects.all()

@@ -29,16 +29,24 @@ class Cliente(models.Model):
     def __str__(self):
         return f"{self.nombre or 'Sin Nombre'} ({self.celular})"
 
+class Categoria(models.Model):
+    clave_vehiculo = models.CharField(max_length=20) # CARRO, MOTO, CAMIONETA_5, CAMIONETA_7, BICICLETA
+    tipo_vehiculo = models.CharField(max_length=40) # Automóvil, Motocicleta, Camioneta (5 Pasajeros), Camioneta (7 Pasajeros), Bicicleta
+    lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='categorias')
+    activo = models.BooleanField(default=True)
+    def __str__(self):
+        return f"{self.tipo_vehiculo} - {self.lavadero.nombre}"
+
 class Vehiculo(models.Model):
-    TIPO_CHOICES = [
-        ('CARRO', 'Automóvil'),
-        ('MOTO', 'Motocicleta'),
-        ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
-        ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
-        ('BICICLETA', 'Bicicleta'),
-    ]
+    #TIPO_CHOICES = [
+    #    ('CARRO', 'Automóvil'),
+    #    ('MOTO', 'Motocicleta'),
+    #    ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
+    #    ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
+    #    ('BICICLETA', 'Bicicleta'),
+    #]
     placa = models.CharField(max_length=10) # Unique constraint removed to allow multiple vehiculos with same placa , unique=True, 
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    tipo = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='vehiculos')
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='vehiculos')
     marca = models.CharField(max_length=50, blank=True, null=True)
     modelo = models.CharField(max_length=50, blank=True, null=True)
@@ -48,22 +56,22 @@ class Vehiculo(models.Model):
         return f"{self.placa} - {self.tipo}"
 
 class Servicio(models.Model):
-    CATEGORIA_CHOICES = [
-        ('CARRO', 'Carro'),
-        ('MOTO', 'Moto'),
-        ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
-        ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
-        ('BICICLETA', 'Bicicleta'),
-    ]
+    #CATEGORIA_CHOICES = [
+    #    ('CARRO', 'Carro'),
+    #    ('MOTO', 'Moto'),
+    #    ('CAMIONETA_5', 'Camioneta (5 Pasajeros)'),
+    #    ('CAMIONETA_7', 'Camioneta (7 Pasajeros)'),
+    ##    ('BICICLETA', 'Bicicleta'),
+    #]
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default='CARRO')
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='servicios')
     activo = models.BooleanField(default=True)
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='servicios')
 
     def __str__(self):
-        return f"{self.nombre} ({self.get_categoria_display()}) - ${self.precio}"
+        return f"{self.nombre} ({self.categoria.tipo_vehiculo}) - ${self.precio}"
 
 class Operario_lavado(models.Model):
     nombre_operario = models.CharField(max_length=100, blank=True, null=True)
