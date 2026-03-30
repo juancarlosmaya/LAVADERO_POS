@@ -1,0 +1,157 @@
+{% extends 'Cliente/base.html' %}
+{% load static %}
+
+{% block title %}Estado de Gastos - {{ lavadero.nombre|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Estado de Gastos</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <h4 class="mb-2"><i class="bx bx-receipt me-2"></i>Estado de Gastos</h4>
+    <p class="text-muted">{{ lavadero.nombre|default:"Lavadero" }} - {{ titulo }}</p>
+  </div>
+</div>
+
+<!-- Filtros por período -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="btn-group" role="group">
+      <a href="?periodo=dia"
+        class="btn btn-sm {% if periodo == 'dia' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-day me-1"></i> Hoy
+      </a>
+      <a href="?periodo=semana"
+        class="btn btn-sm {% if periodo == 'semana' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-week me-1"></i> Esta Semana
+      </a>
+      {% if nombre_grupo_usuario == "administrador" %}
+      <a href="?periodo=mes"
+        class="btn btn-sm {% if periodo == 'mes' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-month me-1"></i> Este Mes
+      </a>
+      <a href="?periodo=anio"
+        class="btn btn-sm {% if periodo == 'anio' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-range me-1"></i> Este Año
+      </a>
+      {% endif %}
+    </div>
+    
+    <a href="{% url 'nuevo_gasto' %}" class="btn btn-sm btn-success ms-2">
+      <i class="bx bx-plus me-1"></i> Nuevo Gasto
+    </a>
+  </div>
+</div>
+
+{% if gastos %}
+<!-- Resumen del período -->
+<div class="row mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card">
+      <div class="card-body pb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="content-left">
+            <span class="text-muted d-block mb-2">Total de Gastos</span>
+            <div class="display-6 text-danger">${{ total_dia|floatformat:0 }}</div>
+          </div>
+          <div
+            style="width: 70px; height: 70px; background-color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="bx bx-money" style="font-size: 32px; color: white;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card">
+      <div class="card-body pb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="content-left">
+            <span class="text-muted d-block mb-2">Cantidad de Gastos</span>
+            <div class="display-6 text-primary">{{ gastos|length }}</div>
+          </div>
+          <div
+            style="width: 70px; height: 70px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="bx bx-list-ol" style="font-size: 32px; color: white;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de gastos -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Detalle de Gastos</h5>
+      </div>
+      <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Tipo de Gasto</th>
+              <th>Monto</th>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              {% if nombre_grupo_usuario == "administrador" %}
+              <th>Acciones</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for gasto in gastos %}
+            <tr>
+              <td>
+                <span class="badge bg-label-primary">{{ gasto.get_tipo_gasto_display }}</span>
+              </td>
+              <td>
+                <strong class="text-danger">${{ gasto.monto|floatformat:0 }}</strong>
+              </td>
+              <td><small class="text-muted">{{ gasto.fecha_gasto|date:"d/m/Y" }}</small></td>
+              <td>{{ gasto.descripcion|default:"-" }}</td>
+              {% if nombre_grupo_usuario == "administrador" %}
+              <td class="text-center">
+                <a href="#" title="Eliminar" class="text-danger">
+                  <i class="bx bx-trash" aria-hidden="true"></i>
+                </a>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- Mensaje vacío -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bx bx-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+        <h5 class="text-muted fw-bold mt-3">No hay gastos registrados</h5>
+        <p class="text-muted mb-0">Para el período: <strong>{{ titulo }}</strong></p>
+        <div class="mt-4">
+          <a href="{% url 'dashboard' %}" class="btn btn-primary">
+            <i class="bx bx-arrow-back me-2"></i>Volver al Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

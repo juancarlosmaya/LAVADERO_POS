@@ -1,7 +1,29 @@
 from django import forms
 from django.contrib.auth.models import User
-from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado, Categoria
+from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado, Categoria, Gasto
 
+class GastoForm(forms.ModelForm):
+    class Meta:
+        model = Gasto
+        fields = ['tipo_gasto', 'monto', 'descripcion', 'fecha_gasto',]
+        widgets = {
+            'tipo_gasto': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'monto': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Monto del gasto'
+            }),
+            'fecha_gasto': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Descripción del gasto',
+                'rows': 3
+            }),
+        }
 
 class loginFormulario(forms.Form):
     nombreUsuario = forms.CharField(

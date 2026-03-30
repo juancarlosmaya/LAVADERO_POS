@@ -4,32 +4,17 @@
   <div class="app-brand demo">
     <a href="{% url 'dashboard' %}" class="app-brand-link">
       <span class="app-brand-logo demo">
-        <svg
-          viewBox="0 0 25 42"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
+        <svg viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
           <defs>
             <path
               d="M13.7071045,0.5 C6.0147235,0.5 0.5,5.98772511 0.5,13.5862068 L0.5,27.2496644 C0.5,34.8481461 6.0147235,40.5 13.7071045,40.5 C21.3994856,40.5 27,34.8481461 27,27.2496644 L27,13.5862068 C27,5.98772511 21.3994856,0.5 13.7071045,0.5 Z"
-              id="path-1"
-            ></path>
-            <filter
-              x="-50%"
-              y="-50%"
-              width="200%"
-              height="200%"
-              filterUnits="objectBoundingBox"
-              id="filter-2"
-            >
+              id="path-1"></path>
+            <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
               <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
               <feGaussianBlur stdDeviation="3.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-              <feColorMatrix
-                values="0 0 0 0 0.359180953 0 0 0 0 0.575211693 0 0 0 0 0.809357541 0 0 0 0.3 0"
-                type="matrix"
-                in="shadowBlurOuter1"
-              ></feColorMatrix>
+              <feColorMatrix values="0 0 0 0 0.359180953 0 0 0 0 0.575211693 0 0 0 0 0.809357541 0 0 0 0.3 0"
+                type="matrix" in="shadowBlurOuter1"></feColorMatrix>
             </filter>
           </defs>
           <g id="Brand-Logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -72,9 +57,9 @@
     </li>
 
     <li class="menu-item {% if request.resolver_match.url_name == 'estado_servicios' %}active{% endif %}">
-      <a href="{% url 'estado_servicios' %}" class="menu-link">
+      <a href="{% url 'estado_ordenes' %}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-list-check"></i>
-        <div data-i18n="Status">Estado de Servicios</div>
+        <div data-i18n="Status">Estado de Ordenes</div>
       </a>
     </li>
 

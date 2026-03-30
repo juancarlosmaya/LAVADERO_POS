@@ -1,13 +1,35 @@
 from django.forms import model_to_dict
 from django.test import Client
-from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero, Operario_lavado
+from Servidor.models import Servicio, Orden, Vehiculo, Cliente, Lavadero, Operario_lavado, Gasto
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
-from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm, OperarioLavadoForm
+from .forms import loginFormulario, OrdenForm, VehiculoForm, ClienteForm, OperarioLavadoForm, GastoForm
 import requests
 import json
+
+def nuevo_gasto(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == 'POST':
+        form = GastoForm(request.POST)
+        if form.is_valid():
+            gasto = form.save(commit=False)
+            gasto.lavadero = request.user.perfil_usuarios.lavadero
+            gasto.save()
+            return redirect('dashboard')
+    else:
+        form = GastoForm()
+    
+    #gastos = Gasto.objects.filter(lavadero=request.user.perfil_usuarios.lavadero)
+    #total_gastos = gastos.aggregate(Sum('monto'))['monto__sum'] or 0
+    
+    return render(request, 'Cliente/nuevo_gasto.html', {
+        'form': form,
+        #'gastos': gastos,
+    #    'total_gastos': total_gastos
+    })
 
 def home(request):
     print("Bienvenido HOME")
@@ -147,7 +169,50 @@ def ticket_orden(request, orden_id):
     lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
     return render(request, 'Cliente/ticket_orden.html', {'orden': orden, 'lavadero': lavadero_sesion})
 
-def estado_servicios(request):
+def estado_gastos(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
+    print("Lavadero de la sesión:", lavadero_sesion)
+    
+    grupo_usuario = request.user.groups.first()  # Obtiene el primer grupo del usuario
+    nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
+    
+    periodo = request.GET.get('periodo', 'dia')
+    hoy = timezone.localtime(timezone.now()).date()
+    
+    # Definir fecha de inicio según periodo
+    if periodo == 'semana':
+        fecha_inicio = hoy - timedelta(days=7)
+        titulo_periodo = "Última Semana"
+    elif periodo == 'mes':
+        fecha_inicio = hoy - timedelta(days=30)
+        titulo_periodo = "Último Mes"
+    elif periodo == 'anio':
+        fecha_inicio = hoy - timedelta(days=365)
+        titulo_periodo = "Último Año"
+    else:
+        fecha_inicio = hoy
+        titulo_periodo = "Día Actual"
+
+    gastos = lavadero_sesion.gastos.filter(fecha_gasto__gte=fecha_inicio).order_by('-fecha_gasto')
+    
+    total_periodo = 0
+    for gasto in gastos:
+        total_periodo += gasto.monto
+        
+    return render(request, 'Cliente/estado_gastos.html', {
+        'gastos': gastos,
+        'total_dia': total_periodo,
+        'fecha': hoy,
+        'titulo': titulo_periodo,
+        'periodo': periodo,
+        'lavadero': lavadero_sesion,
+        'nombre_grupo_usuario': nombre_grupo_usuario
+    })
+
+def estado_ordenes(request):
     if not request.user.is_authenticated:
         return redirect('login')
     
@@ -181,7 +246,7 @@ def estado_servicios(request):
         orden.total_calculado = sum(s.precio for s in orden.servicios.all())
         total_periodo += orden.total_calculado
         
-    return render(request, 'Cliente/estado_servicios.html', {
+    return render(request, 'Cliente/estado_ordenes.html', {
         'ordenes': ordenes,
         'total_dia': total_periodo,
         'fecha': hoy,

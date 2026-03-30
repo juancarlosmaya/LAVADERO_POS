@@ -1,0 +1,184 @@
+{% extends 'Cliente/base.html' %}
+{% load static %}
+
+{% block title %}Estado de Ordenes - {{ lavadero.nombre|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Estado de Ordenes</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <h4 class="mb-2"><i class="bx bx-graph-up me-2"></i>Estado de Ordenes</h4>
+    <p class="text-muted">{{ lavadero.nombre|default:"Lavadero" }} - {{ titulo }}</p>
+  </div>
+</div>
+
+<!-- Filtros por período -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="btn-group" role="group">
+      <a href="?periodo=dia"
+        class="btn btn-sm {% if periodo == 'dia' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-day me-1"></i> Hoy
+      </a>
+      <a href="?periodo=semana"
+        class="btn btn-sm {% if periodo == 'semana' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-week me-1"></i> Esta Semana
+      </a>
+      {% if nombre_grupo_usuario == "administrador" %}
+      <a href="?periodo=mes"
+        class="btn btn-sm {% if periodo == 'mes' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-month me-1"></i> Este Mes
+      </a>
+      <a href="?periodo=anio"
+        class="btn btn-sm {% if periodo == 'anio' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="bx bx-calendar-range me-1"></i> Este Año
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if ordenes %}
+<!-- Resumen del período -->
+<div class="row mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card">
+      <div class="card-body pb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="content-left">
+            <span class="text-muted d-block mb-2">Total de Ingresos</span>
+            <div class="display-6 text-success">{{ total_dia|floatformat:0|add:"$" }}</div>
+          </div>
+          <div
+            style="width: 70px; height: 70px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa fa-dollar-sign" style="font-size: 32px; color: white;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <div class="card">
+      <div class="card-body pb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="content-left">
+            <span class="text-muted d-block mb-2">Total de Órdenes</span>
+            <div class="display-6 text-primary">{{ ordenes|length }}</div>
+          </div>
+          <div
+            style="width: 70px; height: 70px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa fa-list-check" style="font-size: 32px; color: white;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de órdenes -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Detalle de Órdenes</h5>
+      </div>
+      <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#Orden</th>
+              <th>Vehículo</th>
+              <th>Placa</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Servicios</th>
+              <th>Operario</th>
+              <th>Total</th>
+              {% if nombre_grupo_usuario == "administrador" %}
+              <th>Acciones</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+            {% for orden in ordenes %}
+            <tr>
+              <td>
+                <span class="badge bg-primary">#{{ orden.id }}</span>
+              </td>
+              <td class="fw-bold">{{ orden.vehiculo.tipo.tipo_vehiculo }}</td>
+              <td><span class="text-uppercase fw-bold">{{ orden.vehiculo.placa }}</span></td>
+              <td>
+                {% if orden.estado == 'completada' %}
+                <span class="badge bg-success">
+                  <i class="bx bx-check-circle me-1"></i>Completada
+                </span>
+                {% elif orden.estado == 'pendiente' %}
+                <span class="badge bg-warning">
+                  <i class="bx bx-clock me-1"></i>Pendiente
+                </span>
+                {% elif orden.estado == 'cancelada' %}
+                <span class="badge bg-danger">
+                  <i class="bx bx-x-circle me-1"></i>Cancelada
+                </span>
+                {% else %}
+                <span class="badge bg-secondary">{{ orden.estado }}</span>
+                {% endif %}
+              </td>
+              <td><small class="text-muted">{{ orden.fecha_creacion|date:"d/m/y H:i" }}</small></td>
+              <td>
+                <small>
+                  {% for servicio in orden.servicios.all %}
+                  <span class="badge bg-info me-1 mb-1">{{ servicio.nombre }}</span>
+                  {% endfor %}
+                </small>
+              </td>
+              <td><span class="text-uppercase fw-bold">{{ orden.operario_lavado.nombre_operario }}</span></td>
+              <td>
+                <strong class="text-success">${{ orden.total_calculado|floatformat:0 }}</strong>
+              </td>
+              {% if nombre_grupo_usuario == "administrador" %}
+              <td class="text-center">
+                <a href="{% url 'eliminar_orden' orden.id %}" title="Eliminar" aria-label="Eliminar orden"
+                  class="text-danger">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </a>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- Mensaje vacío -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bx bx-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+        <h5 class="text-muted fw-bold mt-3">No hay servicios registrados</h5>
+        <p class="text-muted mb-0">Para el período: <strong>{{ titulo }}</strong></p>
+        <div class="mt-4">
+          <a href="{% url 'dashboard' %}" class="btn btn-primary">
+            <i class="bx bx-arrow-back me-2"></i>Volver al Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

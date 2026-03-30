@@ -19,37 +19,73 @@
   <div class="col-md-6 col-lg-4 mb-4">
     <div class="card h-100">
       <div class="card-body text-center">
-        <div style="width: 80px; height: 80px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+        <div
+          style="width: 80px; height: 80px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
           <i class="fas fa-file-alt"></i>
         </div>
         <h5 class="card-title mb-2">Nueva Orden</h5>
         <p class="card-text mb-4">Crear una nueva orden de lavado para vehículos</p>
-        <a href="{% url 'nueva_orden' %}" class="btn btn-primary">Crear Orden</a>
+        <a href="{% url 'nueva_orden' %}" class="btn text-white"
+          style="background-color: #007bff; border-color: #007bff;">Crear Orden</a>
       </div>
     </div>
   </div>
 
-  <!-- Tarjeta Estado de Servicios -->
+  <!-- Tarjeta Estado de Ordenes -->
   <div class="col-md-6 col-lg-4 mb-4">
     <div class="card h-100">
       <div class="card-body text-center">
-        <div style="width: 80px; height: 80px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+        <div
+          style="width: 80px; height: 80px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
           <i class="fas fa-check-circle"></i>
         </div>
-        <h5 class="card-title mb-2">Estado de Servicios</h5>
+        <h5 class="card-title mb-2">Estado de Ordenes</h5>
         <p class="card-text mb-4">Consultar órdenes completadas y en proceso</p>
-        <a href="{% url 'estado_servicios' %}" class="btn btn-success">Ver Estado</a>
+        <a href="{% url 'estado_ordenes' %}" class="btn btn-success">Ver Estado</a>
       </div>
     </div>
   </div>
 
-  <!-- Tarjeta de Información -->
-
   {% if nombre_grupo_usuario == "administrador" %}
+
+  <!-- Tarjeta Nuevo Gasto -->
   <div class="col-md-6 col-lg-4 mb-4">
     <div class="card h-100">
       <div class="card-body text-center">
-        <div style="width: 80px; height: 80px; background-color: #17a2b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+        <div
+          style="width: 80px; height: 80px; background-color: #ffc107; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <h5 class="card-title mb-2">Nuevo Gasto</h5>
+        <p class="card-text mb-4">Registrar un nuevo gasto del lavadero</p>
+        <a href="{% url 'nuevo_gasto' %}" class="btn btn-warning">Registrar Gasto</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta Estado de gastos -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div
+          style="width: 80px; height: 80px; background-color: #6f42c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
+          <i class="fas fa-list-alt"></i>
+        </div>
+        <h5 class="card-title mb-2">Estado de Gastos</h5>
+        <p class="card-text mb-4">Consultar gastos del lavadero</p>
+        <a href="{% url 'estado_gastos' %}" class="btn text-white"
+          style="background-color: #6f42c1; border-color: #6f42c1;">Ver Gastos</a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Tarjeta de Información 
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div
+          style="width: 80px; height: 80px; background-color: #17a2b8; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: white;">
           <i class="fas fa-building"></i>
         </div>
         <h5 class="card-title mb-2">Información</h5>
@@ -58,61 +94,63 @@
       </div>
     </div>
   </div>
+  -->
   {% endif %}
 
 
-<!-- Información del Lavadero -->
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">
-          <i class="bx bx-building"></i> Información del Lavadero
-        </h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6 col-lg-3 mb-3">
-            <div class="d-flex align-items-center">
-              <div class="badge badge-center rounded-pill bg-label-primary p-3 me-3">
-                <i class="bx bx-building bx-sm"></i>
-              </div>
-              <div>
-                <h6 class="mb-0 text-nowrap">Nombre</h6>
-                <small class="text-muted">{{ lavadero.nombre|default:"No especificado" }}</small>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-3 mb-3">
-            <div class="d-flex align-items-center">
-              <div class="badge badge-center rounded-pill bg-label-success p-3 me-3">
-                <i class="bx bx-id-card bx-sm"></i>
-              </div>
-              <div>
-                <h6 class="mb-0 text-nowrap">NIT</h6>
-                <small class="text-muted">{{ lavadero.nit|default:"No especificado" }}</small>
+  <!-- Información del Lavadero -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="bx bx-building"></i> Información del Lavadero
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="d-flex align-items-center">
+                <div class="badge badge-center rounded-pill bg-label-primary p-3 me-3">
+                  <i class="bx bx-building bx-sm"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 text-nowrap">Nombre</h6>
+                  <small class="text-muted">{{ lavadero.nombre|default:"No especificado" }}</small>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-6 col-lg-3 mb-3">
-            <div class="d-flex align-items-center">
-              <div class="badge badge-center rounded-pill bg-label-warning p-3 me-3">
-                <i class="bx bx-phone bx-sm"></i>
-              </div>
-              <div>
-                <h6 class="mb-0 text-nowrap">Teléfono</h6>
-                <small class="text-muted">{{ lavadero.telefono|default:"No especificado" }}</small>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="d-flex align-items-center">
+                <div class="badge badge-center rounded-pill bg-label-success p-3 me-3">
+                  <i class="bx bx-id-card bx-sm"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 text-nowrap">NIT</h6>
+                  <small class="text-muted">{{ lavadero.nit|default:"No especificado" }}</small>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-6 col-lg-3 mb-3">
-            <div class="d-flex align-items-center">
-              <div class="badge badge-center rounded-pill bg-label-danger p-3 me-3">
-                <i class="bx bx-map bx-sm"></i>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="d-flex align-items-center">
+                <div class="badge badge-center rounded-pill bg-label-warning p-3 me-3">
+                  <i class="bx bx-phone bx-sm"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 text-nowrap">Teléfono</h6>
+                  <small class="text-muted">{{ lavadero.telefono|default:"No especificado" }}</small>
+                </div>
               </div>
-              <div>
-                <h6 class="mb-0 text-nowrap">Ubicación</h6>
-                <small class="text-muted">{{ lavadero.direccion|default:"No especificado" }}</small>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-3">
+              <div class="d-flex align-items-center">
+                <div class="badge badge-center rounded-pill bg-label-danger p-3 me-3">
+                  <i class="bx bx-map bx-sm"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 text-nowrap">Ubicación</h6>
+                  <small class="text-muted">{{ lavadero.direccion|default:"No especificado" }}</small>
+                </div>
               </div>
             </div>
           </div>
@@ -120,5 +158,4 @@
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
