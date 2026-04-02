@@ -26,7 +26,7 @@
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <strong>Errores encontrados:</strong>
           {% for error in formulario.non_field_errors %}
-            <div>{{ error }}</div>
+          <div>{{ error }}</div>
           {% endfor %}
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -44,34 +44,35 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="id_placa" class="form-label">Placa del Vehículo</label>
-                  <input type="text" class="form-control {% if vehiculo_form.placa.errors %}is-invalid{% endif %}" 
-                    id="id_placa" name="placa" placeholder="ABC-1234" style="text-transform: uppercase;" value="{{vehiculo_form.placa.value|default:''}}">
+                  <input type="text" class="form-control {% if vehiculo_form.placa.errors %}is-invalid{% endif %}"
+                    id="id_placa" name="placa" placeholder="ABC-1234" style="text-transform: uppercase;"
+                    value="{{vehiculo_form.placa.value|default:''}}">
                   {% if vehiculo_form.placa.errors %}
-                    <div class="invalid-feedback">{{ vehiculo_form.placa.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ vehiculo_form.placa.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
                   <label for="id_tipo" class="form-label">Tipo de Vehículo</label>
-                  <select class="form-select {% if vehiculo_form.tipo.errors %}is-invalid{% endif %}" 
-                    id="id_tipo" name="tipo">
+                  <select class="form-select {% if vehiculo_form.tipo.errors %}is-invalid{% endif %}" id="id_tipo"
+                    name="tipo">
                     <option value="">Selecciona un tipo...</option>
                     {% for value, label in vehiculo_form.tipo.field.choices %}
-                      {% if value %}
-                        <option value="{{ value }}">{{ label }}</option>
-                      {% endif %}
+                    {% if value %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endif %}
                     {% endfor %}
                   </select>
                   <small class="form-text text-muted">Selecciona para filtrar servicios disponibles</small>
                   {% if vehiculo_form.tipo.errors %}
-                    <div class="invalid-feedback">{{ vehiculo_form.tipo.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ vehiculo_form.tipo.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
                   <label for="id_marca" class="form-label">Marca</label>
-                  <input type="text" class="form-control {% if vehiculo_form.marca.errors %}is-invalid{% endif %}" 
+                  <input type="text" class="form-control {% if vehiculo_form.marca.errors %}is-invalid{% endif %}"
                     id="id_marca" name="marca" placeholder="ej: Mazda" value="{{vehiculo_form.marca.value|default:''}}">
                   {% if vehiculo_form.marca.errors %}
-                    <div class="invalid-feedback">{{ vehiculo_form.marca.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ vehiculo_form.marca.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <!--
@@ -97,18 +98,20 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="id_nombre" class="form-label">Nombre Completo</label>
-                  <input type="text" class="form-control {% if cliente_form.nombre.errors %}is-invalid{% endif %}" 
-                    id="id_nombre" name="nombre" placeholder="Nombre del cliente" value="{{cliente_form.nombre.value|default:''}}">
+                  <input type="text" class="form-control {% if cliente_form.nombre.errors %}is-invalid{% endif %}"
+                    id="id_nombre" name="nombre" placeholder="Nombre del cliente"
+                    value="{{cliente_form.nombre.value|default:''}}">
                   {% if cliente_form.nombre.errors %}
-                    <div class="invalid-feedback">{{ cliente_form.nombre.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ cliente_form.nombre.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
                   <label for="id_celular" class="form-label">Número de Celular</label>
-                  <input type="text" class="form-control {% if cliente_form.celular.errors %}is-invalid{% endif %}" 
-                    id="id_celular" name="celular" placeholder="3001234567" value="{{cliente_form.celular.value|default:''}}">
+                  <input type="text" class="form-control {% if cliente_form.celular.errors %}is-invalid{% endif %}"
+                    id="id_celular" name="celular" placeholder="3001234567"
+                    value="{{cliente_form.celular.value|default:''}}">
                   {% if cliente_form.celular.errors %}
-                    <div class="invalid-feedback">{{ cliente_form.celular.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ cliente_form.celular.errors.0 }}</div>
                   {% endif %}
                 </div>
               </div>
@@ -124,18 +127,20 @@
               <div id="servicesContainer">
                 <!-- Los servicios se mostrarán aquí cuando selecciones un tipo de vehículo -->
                 <div class="alert alert-info mb-0" id="serviciosAviso">
-                  <i class="bx bx-info-circle me-2"></i>Selecciona un tipo de vehículo para ver los servicios disponibles
+                  <i class="bx bx-info-circle me-2"></i>Selecciona un tipo de vehículo para ver los servicios
+                  disponibles
                 </div>
               </div>
-              
+
               <!-- Contenedor oculto con datos de servicios por categoría -->
               <div id="serviciosData" style="display: none;">
                 {% for categoria, servicios in servicios_por_categoria.items %}
-                  <div class="servicios-categoria" data-categoria="{{ categoria }}">
-                    {% for servicio in servicios %}
-                      <div class="servicio-item" data-id="{{ servicio.id }}" data-precio="{{ servicio.precio }}" data-nombre="{{ servicio.nombre }}" data-descripcion="{{ servicio.descripcion }}"></div>
-                    {% endfor %}
-                  </div>
+                <div class="servicios-categoria" data-categoria="{{ categoria }}">
+                  {% for servicio in servicios %}
+                  <div class="servicio-item" data-id="{{ servicio.id }}" data-precio="{{ servicio.precio }}"
+                    data-nombre="{{ servicio.nombre }}" data-descripcion="{{ servicio.descripcion }}"></div>
+                  {% endfor %}
+                </div>
                 {% endfor %}
               </div>
             </div>
@@ -150,48 +155,51 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="id_tiempo_inicio_servicio" class="form-label">Hora de Inicio</label>
-                  <input type="time" class="form-control {% if orden_form.tiempo_inicio_servicio.errors %}is-invalid{% endif %}" 
-                    id="id_tiempo_inicio_servicio" name="tiempo_inicio_servicio" value="{{ orden_form.tiempo_inicio_servicio.value|default:'' }}">
+                  <input type="time"
+                    class="form-control {% if orden_form.tiempo_inicio_servicio.errors %}is-invalid{% endif %}"
+                    id="id_tiempo_inicio_servicio" name="tiempo_inicio_servicio"
+                    value="{{ orden_form.tiempo_inicio_servicio.value|default:'' }}">
                   <small class="form-text text-muted">Hora en que comienza el servicio de lavado</small>
                   {% if orden_form.tiempo_inicio_servicio.errors %}
-                    <div class="invalid-feedback">{{ orden_form.tiempo_inicio_servicio.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ orden_form.tiempo_inicio_servicio.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
-                  <label for="id_tiempo_adicional_servicio" class="form-label">Tiempo Adicional del Servicio (opcional)</label>
-                  <select class="form-select {% if orden_form.tiempo_adicional_servicio.errors %}is-invalid{% endif %}" 
+                  <label for="id_tiempo_adicional_servicio" class="form-label">Tiempo Adicional del Servicio
+                    (opcional)</label>
+                  <select class="form-select {% if orden_form.tiempo_adicional_servicio.errors %}is-invalid{% endif %}"
                     id="id_tiempo_adicional_servicio" name="tiempo_adicional_servicio">
                     <option value="">Selecciona un tiempo...</option>
                     {% for value, label in orden_form.tiempo_adicional_servicio.field.choices %}
-                      {% if value %}
-                        <option value="{{ value }}">{{ label }}</option>
-                      {% endif %}
+                    {% if value %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endif %}
                     {% endfor %}
                   </select>
                   <small class="form-text text-muted">Selecciona para filtrar tiempos adicionales disponibles</small>
                   {% if orden_form.tiempo_adicional_servicio.errors %}
-                    <div class="invalid-feedback">{{ orden_form.tiempo_adicional_servicio.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ orden_form.tiempo_adicional_servicio.errors.0 }}</div>
                   {% endif %}
                 </div>
                 <div class="col-md-6">
                   <label for="id_operario_lavado" class="form-label">Operario Servicio:</label>
-                  <select class="form-select {% if operario_lavado_form.errors %}is-invalid{% endif %}" 
+                  <select class="form-select {% if operario_lavado_form.errors %}is-invalid{% endif %}"
                     id="id_operario_lavado" name="nombre_operario">
                     <option value="">Selecciona un Operario...</option>
                     {% for operario in operarios %}
-                      <option value="{{ operario.nombre_operario }}">{{ operario.nombre_operario }}</option>
+                    <option value="{{ operario.nombre_operario }}">{{ operario.nombre_operario }}</option>
                     {% endfor %}
                   </select>
                   <small class="form-text text-muted">Selecciona un operario de lavado</small>
                   {% if operario_lavado_form.errors %}
-                    <div class="invalid-feedback">{{ operario_lavado_form.errors.0 }}</div>
+                  <div class="invalid-feedback">{{ operario_lavado_form.errors.0 }}</div>
                   {% endif %}
                 </div>
               </div>
             </div>
           </div>
 
-          
+
 
           <!-- SECCIÓN 5: OBSERVACIONES -->
           <div class="card mb-4">
@@ -200,12 +208,12 @@
             </div>
             <div class="card-body">
               <label for="id_observaciones" class="form-label">Observaciones</label>
-              <textarea class="form-control {% if orden_form.observaciones.errors %}is-invalid{% endif %}" 
-                id="id_observaciones" name="observaciones" rows="4" 
+              <textarea class="form-control {% if orden_form.observaciones.errors %}is-invalid{% endif %}"
+                id="id_observaciones" name="observaciones" rows="4"
                 placeholder="Detalles especiales o instrucciones sobre el lavado">{{ orden_form.observaciones.value|default_if_none:'' }}</textarea>
               <small class="form-text text-muted">Detalles especiales o instrucciones sobre el lavado</small>
               {% if orden_form.observaciones.errors %}
-                <div class="invalid-feedback">{{ orden_form.observaciones.errors.0 }}</div>
+              <div class="invalid-feedback">{{ orden_form.observaciones.errors.0 }}</div>
               {% endif %}
             </div>
           </div>
@@ -247,59 +255,59 @@
 {% block page_js %}
 <script src="{% static 'Cliente/js/nueva_orden.js' %}"></script>
 <script>
-// Ya no necesitamos mapeo: el valor del select de tipo de vehículo ES el ID de la categoría
+  // Ya no necesitamos mapeo: el valor del select de tipo de vehículo ES el ID de la categoría
 
-// Datos de servicios organizados por categoría (ID)
-const serviciosPorCategoria = {};
+  // Datos de servicios organizados por categoría (ID)
+  const serviciosPorCategoria = {};
 
-// Extraer datos de servicios del DOM
-document.addEventListener('DOMContentLoaded', function() {
-  const categoriaElements = document.querySelectorAll('.servicios-categoria');
-  
-  categoriaElements.forEach(catElement => {
-    const categoria = catElement.getAttribute('data-categoria');
-    const servicios = [];
-    
-    const servicioItems = catElement.querySelectorAll('.servicio-item');
-    servicioItems.forEach(item => {
-      servicios.push({
-        id: item.getAttribute('data-id'),
-        nombre: item.getAttribute('data-nombre'),
-        descripcion: item.getAttribute('data-descripcion'),
-        precio: parseFloat(item.getAttribute('data-precio'))
+  // Extraer datos de servicios del DOM
+  document.addEventListener('DOMContentLoaded', function () {
+    const categoriaElements = document.querySelectorAll('.servicios-categoria');
+
+    categoriaElements.forEach(catElement => {
+      const categoria = catElement.getAttribute('data-categoria');
+      const servicios = [];
+
+      const servicioItems = catElement.querySelectorAll('.servicio-item');
+      servicioItems.forEach(item => {
+        servicios.push({
+          id: item.getAttribute('data-id'),
+          nombre: item.getAttribute('data-nombre'),
+          descripcion: item.getAttribute('data-descripcion'),
+          precio: parseFloat(item.getAttribute('data-precio'))
+        });
       });
+
+      serviciosPorCategoria[categoria] = servicios;
     });
-    
-    serviciosPorCategoria[categoria] = servicios;
-  });
-  
-  // Event listener para cambio de tipo de vehículo
-  const tipoVehiculoSelect = document.getElementById('id_tipo');
-  const servicesContainer = document.getElementById('servicesContainer');
-  const serviciosAviso = document.getElementById('serviciosAviso');
-  
-  if (tipoVehiculoSelect) {
-    tipoVehiculoSelect.addEventListener('change', function() {
-      const tipoId = this.value;
-      console.log('Tipo seleccionado (categoria ID):', tipoId);
-      
-      if (!tipoId) {
-        servicesContainer.innerHTML = `
+
+    // Event listener para cambio de tipo de vehículo
+    const tipoVehiculoSelect = document.getElementById('id_tipo');
+    const servicesContainer = document.getElementById('servicesContainer');
+    const serviciosAviso = document.getElementById('serviciosAviso');
+
+    if (tipoVehiculoSelect) {
+      tipoVehiculoSelect.addEventListener('change', function () {
+        const tipoId = this.value;
+        console.log('Tipo seleccionado (categoria ID):', tipoId);
+
+        if (!tipoId) {
+          servicesContainer.innerHTML = `
           <div class="alert alert-info mb-0" id="serviciosAviso">
             <i class="bx bx-info-circle me-2"></i>Selecciona un tipo de vehículo para ver los servicios disponibles
           </div>
         `;
-        return;
-      }
-      
-      // El tipoId ya ES el ID de la categoría, no necesitamos mapeo
-      const servicios = serviciosPorCategoria[tipoId] || [];
-      
-      if (servicios.length > 0) {
-        let serviciosHTML = '';
-        
-        servicios.forEach(servicio => {
-          serviciosHTML += `
+          return;
+        }
+
+        // El tipoId ya ES el ID de la categoría, no necesitamos mapeo
+        const servicios = serviciosPorCategoria[tipoId] || [];
+
+        if (servicios.length > 0) {
+          let serviciosHTML = '';
+
+          servicios.forEach(servicio => {
+            serviciosHTML += `
             <div class="form-check mb-3 p-3 border rounded" data-categoria="${tipoId}" data-precio="${servicio.precio}">
               <input class="form-check-input service-checkbox" type="checkbox" name="servicios" value="${servicio.id}" 
                 id="servicio_${servicio.id}" data-price="${servicio.precio}">
@@ -314,42 +322,42 @@ document.addEventListener('DOMContentLoaded', function() {
               </label>
             </div>
           `;
-        });
-        
-        servicesContainer.innerHTML = serviciosHTML;
-        agregarEventListenersServicios();
-      } else {
-        servicesContainer.innerHTML = `
+          });
+
+          servicesContainer.innerHTML = serviciosHTML;
+          agregarEventListenersServicios();
+        } else {
+          servicesContainer.innerHTML = `
           <div class="alert alert-warning mb-0">
             <i class="bx bx-exclamation-triangle me-2"></i>No hay servicios disponibles para este tipo de vehículo
           </div>
         `;
-      }
-    });
-  }
-  
-  function agregarEventListenersServicios() {
-    const checkboxes = document.querySelectorAll('.service-checkbox');
-    checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', calcularTotal);
-    });
-  }
-  
-  function calcularTotal() {
-    const checkboxes = document.querySelectorAll('.service-checkbox:checked');
-    let total = 0;
-    
-    checkboxes.forEach(checkbox => {
-      const precio = parseFloat(checkbox.getAttribute('data-price')) || 0;
-      total += precio;
-    });
-    
-    document.getElementById('subtotal').textContent = `$${total.toFixed(0)}`;
-    document.getElementById('total').textContent = `$${total.toFixed(0)}`;
-  }
-  
-  agregarEventListenersServicios();
-});
+        }
+      });
+    }
+
+    function agregarEventListenersServicios() {
+      const checkboxes = document.querySelectorAll('.service-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', calcularTotal);
+      });
+    }
+
+    function calcularTotal() {
+      const checkboxes = document.querySelectorAll('.service-checkbox:checked');
+      let total = 0;
+
+      checkboxes.forEach(checkbox => {
+        const precio = parseFloat(checkbox.getAttribute('data-price')) || 0;
+        total += precio;
+      });
+
+      document.getElementById('subtotal').textContent = `$${total.toFixed(0)}`;
+      document.getElementById('total').textContent = `$${total.toFixed(0)}`;
+    }
+
+    agregarEventListenersServicios();
+  });
 </script>
 {% endblock %}
 {% endblock %}

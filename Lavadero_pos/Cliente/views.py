@@ -10,6 +10,7 @@ import requests
 import json
 
 def nuevo_gasto(request):
+    lavadero_sesion = Lavadero.objects.get(nombre= request.user.perfil_usuarios.lavadero.nombre)
     if not request.user.is_authenticated:
         return redirect('login')
     if request.method == 'POST':
@@ -27,6 +28,7 @@ def nuevo_gasto(request):
     
     return render(request, 'Cliente/nuevo_gasto.html', {
         'form': form,
+        'lavadero': lavadero_sesion,
         #'gastos': gastos,
     #    'total_gastos': total_gastos
     })

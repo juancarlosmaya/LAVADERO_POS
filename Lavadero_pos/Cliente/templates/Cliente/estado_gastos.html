@@ -45,7 +45,7 @@
       </a>
       {% endif %}
     </div>
-    
+
     <a href="{% url 'nuevo_gasto' %}" class="btn btn-sm btn-success ms-2">
       <i class="bx bx-plus me-1"></i> Nuevo Gasto
     </a>
@@ -104,9 +104,11 @@
               <th>Monto</th>
               <th>Fecha</th>
               <th>Descripción</th>
+              <!--
               {% if nombre_grupo_usuario == "administrador" %}
               <th>Acciones</th>
               {% endif %}
+              -->
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
@@ -116,16 +118,18 @@
                 <span class="badge bg-label-primary">{{ gasto.get_tipo_gasto_display }}</span>
               </td>
               <td>
-                <strong class="text-danger">${{ gasto.monto|floatformat:0 }}</strong>
+                <strong class="text-danger">${{ gasto.monto|floatformat:"0g" }}</strong>
               </td>
               <td><small class="text-muted">{{ gasto.fecha_gasto|date:"d/m/Y" }}</small></td>
               <td>{{ gasto.descripcion|default:"-" }}</td>
+              <!--
               {% if nombre_grupo_usuario == "administrador" %}
               <td class="text-center">
                 <a href="#" title="Eliminar" class="text-danger">
                   <i class="bx bx-trash" aria-hidden="true"></i>
                 </a>
               </td>
+              -->
               {% endif %}
             </tr>
             {% endfor %}

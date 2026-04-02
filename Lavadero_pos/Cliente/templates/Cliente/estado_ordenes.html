@@ -57,7 +57,7 @@
         <div class="d-flex justify-content-between align-items-start">
           <div class="content-left">
             <span class="text-muted d-block mb-2">Total de Ingresos</span>
-            <div class="display-6 text-success">{{ total_dia|floatformat:0|add:"$" }}</div>
+            <div class="display-6 text-success">${{ total_dia|floatformat:"0g" }}</div>
           </div>
           <div
             style="width: 70px; height: 70px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -144,7 +144,7 @@
               </td>
               <td><span class="text-uppercase fw-bold">{{ orden.operario_lavado.nombre_operario }}</span></td>
               <td>
-                <strong class="text-success">${{ orden.total_calculado|floatformat:0 }}</strong>
+                <strong class="text-success">${{ orden.total_calculado|floatformat:"0g" }}</strong>
               </td>
               {% if nombre_grupo_usuario == "administrador" %}
               <td class="text-center">
