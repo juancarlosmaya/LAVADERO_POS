@@ -506,7 +506,7 @@
     }
 
     @media(max-width:768px) {
-      .nav-links {
+      .hide-mobile {
         display: none;
       }
 
@@ -527,10 +527,10 @@
   <nav>
     <div class="logo">💧 Manager Pro</div>
     <div class="nav-links">
-      <a href="#features">Funcionalidades</a>
-      <a href="#como-funciona">Cómo Funciona</a>
-      <a href="#precios">Precios</a>
-      <a href="#precios">Solicitar Demo</a>
+      <a href="#features" class="hide-mobile">Funcionalidades</a>
+      <a href="#como-funciona" class="hide-mobile">Cómo Funciona</a>
+      <a href="#precios" class="hide-mobile">Precios</a>
+      <a href="#contacto" class="hide-mobile">Contacto</a>
       <a href="{% url 'login' %}" class="btn-cta">Iniciar Sesión</a>
     </div>
   </nav>
