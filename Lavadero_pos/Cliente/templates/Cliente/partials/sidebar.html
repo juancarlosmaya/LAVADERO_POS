@@ -63,6 +63,28 @@
       </a>
     </li>
 
+    {% if nombre_grupo_usuario == "administrador" %}
+    <!-- Gastos Section -->
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Gastos</span>
+    </li>
+
+    <li class="menu-item {% if request.resolver_match.url_name == 'nuevo_gasto' %}active{% endif %}">
+      <a href="{% url 'nuevo_gasto' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-plus-circle"></i>
+        <div data-i18n="Create">Nuevo Gasto</div>
+      </a>
+    </li>
+
+    <li class="menu-item {% if request.resolver_match.url_name == 'estado_gastos' %}active{% endif %}">
+      <a href="{% url 'estado_gastos' %}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-list-check"></i>
+        <div data-i18n="Status">Estado de Gastos</div>
+      </a>
+    </li>
+
+    {% endif %}
+
     <!-- Account Section -->
     <li class="menu-header small text-uppercase">
       <span class="menu-header-text">Cuenta</span>

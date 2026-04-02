@@ -61,7 +61,7 @@
         <div class="d-flex justify-content-between align-items-start">
           <div class="content-left">
             <span class="text-muted d-block mb-2">Total de Gastos</span>
-            <div class="display-6 text-danger">${{ total_dia|floatformat:0 }}</div>
+            <div class="display-6 text-danger">${{ total_dia|floatformat:"0g" }}</div>
           </div>
           <div
             style="width: 70px; height: 70px; background-color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -139,6 +139,25 @@
     </div>
   </div>
 </div>
+<p></p>
+<!-- BOTONES DE ACCIÓN -->
+<div class="row">
+  <!--
+  <div class="col-6">
+    <button type="submit" class="btn btn-primary w-100" id="guardarImprimirBtn">
+      <i class="bx bx-check-circle me-2"></i>Guardar e Imprimir Orden
+    </button>
+  </div>
+  -->
+  <div class="row justify-content-center">
+    <div class="col-3">
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100">
+        Volver
+      </a>
+    </div>
+  </div>
+</div>
+
 {% else %}
 <!-- Mensaje vacío -->
 <div class="row">

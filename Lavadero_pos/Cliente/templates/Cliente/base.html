@@ -51,6 +51,12 @@
   <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
   <!-- Config -->
   <script src="{% static 'materio/js/config.js' %}"></script>
+  <style>
+    /* Prevenir que el tema capitalice automáticamente el texto de los botones */
+    .btn {
+      text-transform: none !important;
+    }
+  </style>
 </head>
 
 <body>

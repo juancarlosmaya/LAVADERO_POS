@@ -58,6 +58,7 @@
         cursor: pointer;
         text-decoration: none;
         font-family: sans-serif;
+        text-transform: none !important;
     }
 
     .btn-print {
@@ -127,7 +128,7 @@
 <div class="btn-group">
     <button id="btnConnect" class="btn btn-print" onclick="connectAndPrint()">🔍 1. Conectar e Imprimir</button>
     <a href="/nueva-orden/" class="btn btn-new">➕ Nueva Orden</a>
-    <a href="/" class="btn btn-home">🏠 Ir al Inicio</a>
+    <a href="/dashboard/" class="btn btn-home">🏠 Ir al Inicio</a>
 </div>
 <div id="status" class="status-msg"></div>
 
@@ -195,9 +196,8 @@
 
         let total = 0;
         {% for servicio in orden.servicios.all %}
-        total += {{ servicio.precio }
-    };
-    {% endfor %}
+        total += {{ servicio.precio }};
+        {% endfor %}
 
     let data = encoder.encode(text);
     await printCharacteristic.writeValue(data);
@@ -213,7 +213,9 @@
         "retirar tu vehiculo. Recuerda\n" +
         "venir maximo 30 minutos\n" +
         "despues del lavado (antes del\n" +
-        "cobro de parqueadero adicional)\n\n\n";
+        "cobro de parqueadero adicional)\n" +
+        "--------------------------------\n" +
+        "Desarrollado por: managerpro.pythonanywhere.com\n\n\n";
 
     data = encoder.encode(text);
     await printCharacteristic.writeValue(data);
@@ -223,11 +225,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         let total = 0;
         {% for servicio in orden.servicios.all %}
-        total += {{ servicio.precio }
-    };
-    {% endfor %}
-    document.getElementById('totalDisplay').textContent = '$' + total.toFixed(0);
-        });
+        total += {{ servicio.precio }};
+        {% endfor %}
+        document.getElementById('totalDisplay').textContent = '$' + total.toLocaleString();
+    });
 </script>
 
 {% endblock %}
