@@ -5,7 +5,7 @@ from Servidor.models import Orden, Vehiculo, Cliente, Operario_lavado, Categoria
 class GastoForm(forms.ModelForm):
     class Meta:
         model = Gasto
-        fields = ['tipo_gasto', 'monto', 'descripcion', 'fecha_gasto',]
+        fields = ['tipo_gasto', 'monto', 'descripcion', 'fecha_gasto','operario_lavado']
         widgets = {
             'tipo_gasto': forms.Select(attrs={
                 'class': 'form-select'
@@ -23,6 +23,9 @@ class GastoForm(forms.ModelForm):
                 'placeholder': 'Descripción del gasto',
                 'rows': 3
             }),
+            'operario_lavado': forms.Select(attrs={
+                'class': 'form-control'
+            })
         }
 
 class loginFormulario(forms.Form):
@@ -57,7 +60,7 @@ class OrdenForm(forms.ModelForm):
     
     class Meta:
         model = Orden
-        fields = ['tiempo_inicio_servicio', 'observaciones', 'tiempo_adicional_servicio']
+        fields = ['tiempo_inicio_servicio', 'observaciones', 'tiempo_adicional_servicio', 'costo_total']
         widgets = {
             'tiempo_inicio_servicio': forms.TimeInput(attrs={
                 'type': 'time',
@@ -70,7 +73,8 @@ class OrdenForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-100',
                 'rows': 4,
                 'placeholder': 'Ej: Tapetes sucios, limpiar interior...'
-            })
+            }),
+            'costo_total': forms.HiddenInput(),
         }
 
 

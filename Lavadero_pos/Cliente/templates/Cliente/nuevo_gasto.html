@@ -72,6 +72,23 @@
               {% endif %}
             </div>
 
+            <!-- OPERARIO DE LAVADO -->
+            <div class="col-md-6">
+              <label for="id_operario_lavado" class="form-label">Operario de Lavado</label>
+              <select class="form-control" id="id_operario_lavado"
+                name="operario_lavado">
+                <option value="">-- Seleccione un operario --</option>
+                {% for operario in operarios %}
+                <option value="{{ operario.id }}" {% if form.operario_lavado.value|stringformat:"s" == operario.id|stringformat:"s" %}selected{% endif %}>
+                  {{ operario.nombre_operario }}
+                </option>
+                {% endfor %}
+              </select>
+              {% if form.operario_lavado.errors %}
+              <div class="invalid-feedback">{{ form.operario_lavado.errors.0 }}</div>
+              {% endif %}
+            </div>
+
             <!-- DESCRIPCION -->
             <div class="col-12">
               <label for="id_descripcion" class="form-label">Descripción</label>

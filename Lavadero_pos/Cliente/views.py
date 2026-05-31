@@ -25,10 +25,11 @@ def nuevo_gasto(request):
     
     #gastos = Gasto.objects.filter(lavadero=request.user.perfil_usuarios.lavadero)
     #total_gastos = gastos.aggregate(Sum('monto'))['monto__sum'] or 0
-    
+    operarios_sesion = Operario_lavado.objects.filter(lavadero_operario = request.user.perfil_usuarios.lavadero)
     return render(request, 'Cliente/nuevo_gasto.html', {
         'form': form,
         'lavadero': lavadero_sesion,
+        'operarios': operarios_sesion,
         #'gastos': gastos,
     #    'total_gastos': total_gastos
     })
@@ -60,6 +61,8 @@ def crear_orden(request):
     nombre_grupo_usuario = grupo_usuario.name if grupo_usuario else ""  # Extrae el nombre
 
     if request.method == 'POST':
+        print("EL COSTO TOLAL ES:")
+        print(request.POST.get('costo_total'))
         print("datos recibidos en POST:", request.POST)
         vehiculo_form = VehiculoForm(request.POST, lavadero=lavadero_sesion)
         cliente_form = ClienteForm(request.POST)
@@ -87,14 +90,13 @@ def crear_orden(request):
             )
             # Obtener o crear operario de lavado (similar a Vehiculo)
             operario_nombre = (operario_lavado_form.cleaned_data.get('nombre_operario') or '').strip()
-            operario, _ = Operario_lavado.objects.get_or_create(
+            print("EL NOMBRE DEL OPERARIO ES:", operario_nombre)
+            operario = Operario_lavado.objects.get(
                 nombre_operario=operario_nombre,
                 lavadero_operario=lavadero_sesion,
-                defaults={
-                    'celular_operario': '',
-                    'correo_operario': None,
-                }
             )
+            operario.saldo_a_favor = operario.saldo_a_favor + int(float(request.POST.get('costo_total')) * 0.3)
+            operario.save() 
             print("EL NOMBRE DEL OPERARIO ES:", operario.nombre_operario)
 
             # Crear orden
@@ -116,6 +118,7 @@ def crear_orden(request):
             print("message enviado:", message )
             print("Número telefónico:", numero_telefonico )
             
+            ## ARMADO DE METADATOS PARA ENVIAR A LA API DE MENSAJERIA REMOTA PARA ENVIAR EL MENSAJE CUANDO SE FINALICE LA ORDEN
             metadatos = model_to_dict(orden)
             #print("metadatos antes de modificar:", metadatos)
             metadatos['vehiculo'] = orden.vehiculo.tipo.tipo_vehiculo
@@ -123,6 +126,7 @@ def crear_orden(request):
             metadatos['tiempo_inicio_servicio'] = orden.tiempo_inicio_servicio.strftime("%H:%M:%S") if orden.tiempo_inicio_servicio else ""
             metadatos['fecha_creacion'] = orden.fecha_creacion.strftime("%Y-%m-%d %H:%M:%S")
             metadatos['servicios'] = [servicio.nombre for servicio in orden.servicios.all()]
+            metadatos['costo_total'] = int(orden.costo_total)
             print("metadatos después de modificar:", metadatos)
             message = f"Hola, tu orden #{orden.id} - {orden.vehiculo.tipo.tipo_vehiculo} ha finalizado, pasa por tu vehiculo en {lavadero_sesion.nombre}. Tienes 30 minutos antes de cobro de parqueadero adicional. Gracias por tu confianza."
             nuevo_mensaje = {'estado': 'PENDIENTE', 'numero_telefonico': numero_telefonico, 'mensaje': message, 'metadatos': metadatos}

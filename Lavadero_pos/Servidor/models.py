@@ -78,6 +78,7 @@ class Operario_lavado(models.Model):
     celular_operario = models.CharField(max_length=15, blank=True)
     correo_operario = models.EmailField(blank=True, null=True)
     lavadero_operario = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='operarios_lavado')
+    saldo_a_favor = models.DecimalField(max_digits=12, decimal_places=0, default=0)
 
     def __str__(self):
         return f"{self.nombre_operario} - Operario en {self.lavadero_operario.nombre}"
@@ -108,6 +109,7 @@ class Orden(models.Model):
     tiempo_adicional_servicio = models.IntegerField(choices=TIEMPO_ADICIONAL_CHOICES, default=0, blank=True, null=True )
     lavadero = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='ordenes')
     operario_lavado = models.ForeignKey(Operario_lavado, on_delete=models.SET_NULL, null=True, blank=True, related_name='ordenes')
+    costo_total = models.DecimalField(max_digits=12, decimal_places=0, default=0)
     def __str__(self):
         return f"Orden #{self.id} - {self.vehiculo.placa}"
 
@@ -130,6 +132,7 @@ class Pago(models.Model):
 class Gasto(models.Model):
     TIPO_GASTO_CHOICES = [
         ('ARRIENDO', 'Arriendo'),
+        ('SUELDOS', 'Sueldos'),
         ('SERVICIOS_ENERGIA', 'Servicios Energia'),
         ('SERVICIOS_AGUA', 'Servicios Agua'),
         ('SERVICIOS_INTERNET', 'Servicios Internet'),
@@ -149,5 +152,6 @@ class Gasto(models.Model):
     fecha_gasto = models.DateField(auto_now_add=False)
     tipo_gasto = models.CharField(max_length=50, choices=TIPO_GASTO_CHOICES)
     descripcion = models.TextField(blank=True, null=True)
+    operario_lavado = models.ForeignKey(Operario_lavado,on_delete=models.SET_NULL,null=True,blank=True,related_name='gastos')
     def __str__(self):
         return f"Gasto #{self.id} - {self.monto}"
