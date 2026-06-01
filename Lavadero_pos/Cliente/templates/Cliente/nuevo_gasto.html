@@ -73,14 +73,14 @@
             </div>
 
             <!-- OPERARIO DE LAVADO -->
-            <div class="col-md-6">
+            <div class="col-md-6 d-none" id="seccion-operario">
               <label for="id_operario_lavado" class="form-label">Operario de Lavado</label>
               <select class="form-control" id="id_operario_lavado"
                 name="operario_lavado">
                 <option value="">-- Seleccione un operario --</option>
                 {% for operario in operarios %}
                 <option value="{{ operario.id }}" {% if form.operario_lavado.value|stringformat:"s" == operario.id|stringformat:"s" %}selected{% endif %}>
-                  {{ operario.nombre_operario }}
+                  {{ operario.nombre_operario }} (saldo actual a favor: ${{ operario.saldo_a_favor|floatformat:"0g"  }})
                 </option>
                 {% endfor %}
               </select>
@@ -119,4 +119,23 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block page_js %}
+<script>  
+let tipoGasgoEscogido = document.getElementById('id_tipo_gasto');
+const seccionOperario = document.getElementById('seccion-operario');
+
+
+// OCULTA Y MUESTRA LA SECCIÓN DE SELECCIÓN DE OPERARIO SEGUN SE ESCOJA O NO EL TIPO DE GASTO "SUELDOS"
+function funcionCambioTipoGasto() {
+  if (tipoGasgoEscogido.value == 'SUELDOS'){
+    console.log("El gasto es por sueldos, se muestra el campo de operario")
+    seccionOperario.classList.remove('d-none');
+  } else {
+    seccionOperario.classList.add('d-none');
+  }
+}
+tipoGasgoEscogido.addEventListener('change', funcionCambioTipoGasto);
+document.addEventListener('DOMContentLoaded', funcionCambioTipoGasto);
+</script>
 {% endblock %}

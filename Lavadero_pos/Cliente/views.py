@@ -19,6 +19,14 @@ def nuevo_gasto(request):
             gasto = form.save(commit=False)
             gasto.lavadero = request.user.perfil_usuarios.lavadero
             gasto.save()
+            
+            ## DISMINUYE EL SALDO DEL OPERARIO SI EL GASTO ES POR SU SUELDO
+            if gasto.tipo_gasto == 'SUELDOS':
+                operario = Operario_lavado.objects.get(id=gasto.operario_lavado.id)
+                operario.saldo_a_favor -= gasto.monto
+                operario.save()
+                gasto.descripcion = gasto.operario_lavado.nombre_operario + " - " + gasto.descripcion
+                gasto.save()
             return redirect('dashboard')
     else:
         form = GastoForm()
@@ -99,16 +107,19 @@ def crear_orden(request):
             operario.save() 
             print("EL NOMBRE DEL OPERARIO ES:", operario.nombre_operario)
 
-            # Crear orden
+            # Crear orden (guardar costo_total antes de save)
             orden = orden_form.save(commit=False)
             orden.vehiculo = vehiculo
             orden.cliente = cliente
             orden.lavadero = lavadero_sesion
             orden.operario_lavado = operario
+            orden.costo_total = int(float(request.POST.get('costo_total')) * 0.3)
             orden.save()
             
             # Agregar servicios
             orden.servicios.set(servicios_ids)
+            
+            ## ENVIO DE SMS DE CREACIÓN DE ORDEN
             server_sms="https://mensajeriaremota.pythonanywhere.com/APIMensaje/"
             numero_telefonico ="+57"+cliente.celular
             message = f"Hola {cliente.nombre}, tu orden #{orden.id} ha sido creada exitosamente. Gracias por elegirnos. {lavadero_sesion.nombre}."
@@ -118,7 +129,7 @@ def crear_orden(request):
             print("message enviado:", message )
             print("Número telefónico:", numero_telefonico )
             
-            ## ARMADO DE METADATOS PARA ENVIAR A LA API DE MENSAJERIA REMOTA PARA ENVIAR EL MENSAJE CUANDO SE FINALICE LA ORDEN
+            ## ENVIO DE SMS DE ORDEN TERMINADA
             metadatos = model_to_dict(orden)
             #print("metadatos antes de modificar:", metadatos)
             metadatos['vehiculo'] = orden.vehiculo.tipo.tipo_vehiculo

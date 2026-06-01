@@ -152,6 +152,6 @@ class Gasto(models.Model):
     fecha_gasto = models.DateField(auto_now_add=False)
     tipo_gasto = models.CharField(max_length=50, choices=TIPO_GASTO_CHOICES)
     descripcion = models.TextField(blank=True, null=True)
-    operario_lavado = models.ForeignKey(Operario_lavado,on_delete=models.SET_NULL,null=True,blank=True,related_name='gastos')
+    operario_lavado = models.ForeignKey(Operario_lavado,on_delete=models.CASCADE,related_name='gastos')
     def __str__(self):
         return f"Gasto #{self.id} - {self.monto}"
