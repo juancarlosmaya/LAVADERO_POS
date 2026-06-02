@@ -74,7 +74,7 @@ class Servicio(models.Model):
         return f"{self.nombre} ({self.categoria.tipo_vehiculo}) - ${self.precio}"
 
 class Operario_lavado(models.Model):
-    nombre_operario = models.CharField(max_length=100, blank=True, null=True)
+    nombre_operario = models.CharField(max_length=100)
     celular_operario = models.CharField(max_length=15, blank=True)
     correo_operario = models.EmailField(blank=True, null=True)
     lavadero_operario = models.ForeignKey(Lavadero, on_delete=models.CASCADE, related_name='operarios_lavado')
@@ -152,6 +152,6 @@ class Gasto(models.Model):
     fecha_gasto = models.DateField(auto_now_add=False)
     tipo_gasto = models.CharField(max_length=50, choices=TIPO_GASTO_CHOICES)
     descripcion = models.TextField(blank=True, null=True)
-    operario_lavado = models.ForeignKey(Operario_lavado,on_delete=models.CASCADE,related_name='gastos')
+    operario_lavado = models.ForeignKey(Operario_lavado,on_delete=models.CASCADE,related_name='gastos',null=True, blank=True)
     def __str__(self):
         return f"Gasto #{self.id} - {self.monto}"

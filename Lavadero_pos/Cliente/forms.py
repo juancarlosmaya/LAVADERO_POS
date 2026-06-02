@@ -27,6 +27,14 @@ class GastoForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_gasto = cleaned_data.get('tipo_gasto')
+        operario_lavado = cleaned_data.get('operario_lavado')
+
+        if tipo_gasto == 'SUELDOS' and not operario_lavado:
+            self.add_error('operario_lavado', 'Debe seleccionar un operario para gastos de tipo SUELDO.')
 
 class loginFormulario(forms.Form):
     nombreUsuario = forms.CharField(
